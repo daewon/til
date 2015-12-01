@@ -23,16 +23,18 @@ def map2[A, B, C[A] <: Iterable[A], D[_]](iterable: C[A])
   iterable.foreach { e => builder += f(e) }
   builder.result()
 }
-map2(Set(1, 2))(_.toString)(new CanBuildFrom[Nothing, String, Set[String]] {
-  override def apply(from: Nothing): mutable.Builder[String, Set[String]] = ???
-  override def apply(): mutable.Builder[String, Set[String]] = {
-    new mutable.Builder[String, Set[String]] {
-      var collection = Set[String]()
 
-      override def +=(elem: String): this.type = { collection += elem ; this }
-      override def result(): Set[String] = Set()
-      override def clear(): Unit = collection = Set()
-    }
+case class MyContainer[T](ls: List[T] = Nil) {
+  def +=(other: T) = copy(ls = other :: ls)
+}
+map2(Set(1, 2))(_.toString)(new CanBuildFrom[Nothing, String, MyContainer[String]] {
+  override def apply(from: Nothing): mutable.Builder[String, MyContainer[String]] = ???
+  override def apply(): mutable.Builder[String, MyContainer[String]] = new mutable.Builder[String, MyContainer[String]] {
+    var coll = MyContainer[String]()
+
+    override def +=(elem: String): this.type = { coll = coll += elem ; this }
+    override def result(): MyContainer[String] = coll
+    override def clear(): Unit = coll = MyContainer()
   }
 })
 /*
