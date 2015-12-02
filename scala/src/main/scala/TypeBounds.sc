@@ -43,12 +43,16 @@ foo3("100")
 // same as above
 def foo4[T](n: T)(implicit ev: T => Int): Int = n
 // generalized
-def goo[T, E](x: T)(implicit ev: T => E): E = x
-goo("100")
+def goo[T, E](x: T)(implicit ev: T => E): (T, E) = {
+  val converted = ev(x)
+  (x, converted)
+}
+goo("100")((x: String) => x.toInt)
 goo(100)
 def goo2[T, E: ({type L[X] = T => E})#L](x: T): (T, E) = {
-  (x, implicitly[T](x))
+  val converted = implicitly(x)
+  (x, converted)
 }
-goo2("100")
+goo2("100")(Seq(_))
 goo2(100)
 
