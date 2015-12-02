@@ -28,7 +28,7 @@ case class MyContainer[T](ls: List[T] = Nil) {
   def +=(other: T) = copy(ls = other :: ls)
 }
 map2(Set(1, 2))(_.toString)(new CanBuildFrom[Nothing, String, MyContainer[String]] {
-  override def apply(from: Nothing): mutable.Builder[String, MyContainer[String]] = ???
+  override def apply(from: Nothing): mutable.Builder[String, MyContainer[String]] = apply()
   override def apply(): mutable.Builder[String, MyContainer[String]] = new mutable.Builder[String, MyContainer[String]] {
     var coll = MyContainer[String]()
 
@@ -61,3 +61,47 @@ val ls = Seq("daewon" -> "30", "daewon" -> "40", "dun" -> "1")
 val javaList = new java.util.ArrayList[(String, String)]()
 ls.foreach { e => javaList.add(e) }
 combineValues2(javaList)
+/*
+Mock CanBuild
+ */
+trait CanBuild[A, Container[_]] {
+  def make(): Container[A]
+  def append(container: Container[A], item: A)
+}
+trait MIterable[A, Container[_]] { self =>
+  def foreach(f: A => Unit)
+
+  def map[B](f: A => B)(implicit ev: CanBuild[B, Container]): Container[B] = {
+    val newCont = ev.make()
+    self.foreach { a =>
+      val b = f(a)
+      ev.append(newCont, b)
+    }
+
+    newCont
+  }
+}
+
+class MList[T] extends MIterable[T, MList] {
+  var items = List.empty[T]
+
+  override def foreach(f: T => Unit): Unit = items.foreach(f)
+
+  def add(item: T): MList[T] = {
+    items = item :: items
+    this
+  }
+
+  override def toString() = items.toString
+}
+
+implicit def MListCanBuild[T] = new CanBuild[T, MList] {
+  override def make(): MList[T] = new MList[T]
+  override def append(container: MList[T], item: T): Unit = {
+    container.add(item)
+  }
+}
+
+val intList = new MList[Int]
+intList.add(1).add(2).add(3)
+val stringList = intList.map { (i: Int) => (i * 2 ).toString }
