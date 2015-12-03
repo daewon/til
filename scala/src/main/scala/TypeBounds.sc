@@ -1,9 +1,5 @@
 import scala.language.implicitConversions
 
-/**
-http://michalostruszka.pl/blog/2015/03/30/scala-case-classes-to-and-from-tuples/
-  * */
-
 case object My
 
 def typeBound[A: ({type E[_] = String with Int <:< A})#E](arg: A): A = arg
@@ -12,7 +8,6 @@ def typeBound3[A](arg: A)(implicit ev: String with Int with My.type <:< A): A = 
 typeBound(1)
 typeBound("string")
 // typeBound(0.1f) // error on compile
-
 typeBound2(1)
 typeBound2("string")
 // typeBound2(0.1f) // error on compile
@@ -21,10 +16,9 @@ typeBound3("string")
 typeBound3(1)
 typeBound3(My)
 // typeBound3(0.1f) // error on compile
-
 /**
 http://jatinpuri.com/2014/03/replace-view-bounds/
-  * */
+  */
 
 // view bounds @deprecated
 def foo[T <% Int](x: T): Int = x
@@ -32,7 +26,6 @@ implicit def convert[T](n: T) = n match {
   case x: String => x.toInt
 }
 foo("100") // error if convert implicit function was not presented
-
 // context bounds
 type L[X] = X => Int
 def foo2[T: L](n: T): Int = n
@@ -55,4 +48,6 @@ def goo2[T, E: ({type L[X] = T => E})#L](x: T): (T, E) = {
 }
 goo2("100")(Seq(_))
 goo2(100)
-
+def typeBound4[A](a: A)(implicit ev: String with Int <:< A)  = a
+typeBound4(1)
+typeBound4("str")
