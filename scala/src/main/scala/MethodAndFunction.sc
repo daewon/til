@@ -1,5 +1,6 @@
 /**
   * https://tpolecat.github.io/2014/06/09/methods-functions.html
+  * http://stackoverflow.com/questions/2529184/difference-between-method-and-function-in-scala
   */
 // Methods are not Functions
 def add1(n: Int): Int = n + 1
