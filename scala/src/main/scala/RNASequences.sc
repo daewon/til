@@ -22,7 +22,7 @@ final class RNASeq1 private (size: Int)
     val group = groups(groupIndex)
     val offset = 30 - (index % LengthOfGroup) * 2
     val mask = 3 << offset
-    fromInt((mask & group) >> offset)
+    fromInt((mask & group) >>> offset)
   }
   def set(rna: Base, index: Int): Unit = {
     assert(index < size)
@@ -57,7 +57,6 @@ object RNASeq1 {
   def fromSeq(rnas: Seq[Base]): RNASeq1 = {
     val rnaSeq = new RNASeq1(rnas.size)
     rnas.zipWithIndex.foreach { case (r, idx) =>
-      println(s"$r, $idx")
       rnaSeq.set(r, idx)
     }
     rnaSeq
@@ -69,14 +68,11 @@ val rnas = (0 to size -1).map { n =>
   RNASeq1.fromInt(r)
 }
 val rna = RNASeq1.fromSeq(rnas)
-rna(0)
-rna(1)
-rna(2)
-//rna filter { a => A != a }
-//rna filter { a => a != B }
-//rna filter { a => a != C }
-//rna filter { a => a != D }
-//val xs = List(A, B, C, D)
-//val fromXs = RNASeq1.fromSeq(xs)
-//fromXs
+rna filter { a => A != a }
+rna filter { a => a != B }
+rna filter { a => a != C }
+rna filter { a => a != D }
+val xs = List(A, B, C, D)
+val fromXs = RNASeq1.fromSeq(xs)
+fromXs
 
