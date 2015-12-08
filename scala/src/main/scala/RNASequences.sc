@@ -1,20 +1,33 @@
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.ArrayBuffer
-import scala.collection.{mutable, IndexedSeqLike}
+import scala.collection.{IndexedSeqLike, TraversableLike, mutable}
 trait Base {
   val value: Int
 }
-case object A extends Base { val value = 0 }
-case object B extends Base{ val value = 1 }
-case object C extends Base{ val value = 2 }
-case object D extends Base{ val value = 3 }
+case object A extends Base {
+  val value = 0
+}
+case object B extends Base {
+  val value = 1
+}
+
+case object C extends Base {
+  val value = 2
+}
+
+case object D extends Base {
+  val value = 3
+}
 
 object ABCDSeq {
   val sets = Seq(A, B, C, D).map { base => base.value -> base }.toMap
+  val Mask = 3 // 0011
+
   def fromInt(n: Int): Base = sets(n)
+
   def resetBit(n: Int, index: Int) = {
     val offset = 30 - index * 2
-    val mask = 3 << offset // ex) 3 << 2 = 0011 to 1100
+    val mask = Mask << offset // ex) 3 << 2 = 0011 to 1100
     ~mask & n
   }
 
@@ -32,29 +45,49 @@ object ABCDSeq {
   }
 
   def newBuilder = new ArrayBuffer[Base] mapResult fromSeq
+
   implicit def canBuildFrom: CanBuildFrom[ABCDSeq, Base, ABCDSeq] =
     new CanBuildFrom[ABCDSeq, Base, ABCDSeq] {
       def apply(): mutable.Builder[Base, ABCDSeq] = newBuilder
+
       def apply(from: ABCDSeq): mutable.Builder[Base, ABCDSeq] = newBuilder
     }
 }
+
 def toBinary(value: Int, digits: Int = 32) =
   String.format("%" + digits + "s", value.toBinaryString).replace(' ', '0')
-final class ABCDSeq private (size: Int)
+
+class ABCDSeq private(size: Int)
   extends IndexedSeq[Base]
-  with IndexedSeqLike[Base, ABCDSeq]{
+  with IndexedSeqLike[Base, ABCDSeq] {
+
   import ABCDSeq._
+
   val LengthOfGroup = 16
   val groups = new Array[Int]((size / LengthOfGroup) + 1)
+
+  override def foreach[U](f: Base => U): Unit = {
+    var index = 0
+    var group = 0
+
+    while (index < size) {
+      val offset = index % LengthOfGroup
+      if (offset == 0) group = groups(index / LengthOfGroup)
+      val bit = group >>> (30 - offset * 2)
+      f(fromInt(bit & Mask))
+      index += 1
+    }
+  }
+
   override def length: Int = size
-  override def apply(index: Int): Base =  {
-   assert(index < size)
+  override def apply(index: Int): Base = {
+    assert(index < size)
     val groupIndex = index / LengthOfGroup
     val group = groups(groupIndex)
     val offset = 30 - (index % LengthOfGroup) * 2
-    val mask = 3 << offset
-    fromInt((mask & group) >>> offset)
+    fromInt((group >>> offset) & Mask)
   }
+
   def set(rna: Base, index: Int): Unit = {
     assert(index < size)
     val groupIndex = index / LengthOfGroup
@@ -64,13 +97,13 @@ final class ABCDSeq private (size: Int)
   }
 
   override def toString() = {
-    (0 to size -1).map { idx => apply(idx) } mkString("")
+    (0 to size - 1).map { idx => apply(idx) } mkString ("")
   }
+
   override def newBuilder: mutable.Builder[Base, ABCDSeq] = ABCDSeq.newBuilder
 }
-
 val size = 17
-val rnas = (0 to size -1).map { n =>
+val rnas = (0 to size - 1).map { n =>
   val r = n % 3 + 1
   ABCDSeq.fromInt(r)
 }
@@ -87,5 +120,4 @@ fromXs map {
   case A => B
   case _ => C
 } // return type: ABCDSeq, because implement CanBuildFrom
-
 
