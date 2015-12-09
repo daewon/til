@@ -11,9 +11,7 @@ object Ls {
   def apply[E](items: E*): Ls[E] =
     if (items.nonEmpty) Node(items.head, apply(items.tail: _*))
     else Empty
-
 }
-
 
 sealed trait Ls[+E] {
   def map[R](f: E => R): Ls[R]
