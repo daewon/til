@@ -1,8 +1,5 @@
 package memcached
 
-/**
- * User: mauricio
- * Date: 3/30/14
- * Time: 12:26 PM
- */
+import io.netty.channel.ChannelFuture
+
 class FailedFutureException( val channelFuture: ChannelFuture ) extends IllegalStateException

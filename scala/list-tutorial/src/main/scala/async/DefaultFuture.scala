@@ -1,15 +1,15 @@
 package async
 
-import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 class DefaultFuture[T] extends Future[T] {
 
-  class FutureCallback( val function : (Try[T]) => Any, val context : ExecutionContext )
+  class FutureCallback(val function: (Try[T]) => Any, val context: ExecutionContext)
 
-  @volatile private var result : Try[T] = null
+  @volatile private var result: Try[T] = null
   private val callbacks = new ArrayBuffer[FutureCallback]()
 
   def isCompleted: Boolean = result != null
@@ -20,13 +20,13 @@ class DefaultFuture[T] extends Future[T] {
     None
   }
 
-  def complete(value : Try[T]) {
+  def complete(value: Try[T]) {
     if (value == null) {
       throw new IllegalArgumentException("A future can't be completed with null")
     }
 
     synchronized {
-      if ( !this.isCompleted ) {
+      if (!this.isCompleted) {
         result = value
         fireCallbacks()
       }
@@ -55,7 +55,7 @@ class DefaultFuture[T] extends Future[T] {
   override def onComplete[U](f: (Try[T]) => U)(implicit executor: ExecutionContext): Unit = {
     val callback = new FutureCallback(f, executor)
     this.synchronized {
-      if ( this.isCompleted ) {
+      if (this.isCompleted) {
         fireCallback(callback)
       } else {
         callbacks += callback
@@ -68,7 +68,7 @@ class DefaultFuture[T] extends Future[T] {
     callbacks.clear()
   }
 
-  private def fireCallback( callback : FutureCallback) {
+  private def fireCallback(callback: FutureCallback) {
     callback.context.execute(new Runnable {
       def run() = callback.function(result)
     })

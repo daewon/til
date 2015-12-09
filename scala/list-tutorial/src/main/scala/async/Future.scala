@@ -1,7 +1,7 @@
 package async
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 trait Future[T] {
 
@@ -10,6 +10,7 @@ trait Future[T] {
   def value: Option[Try[T]]
 
   def flatMap[S](f: (T) => Future[S])(implicit executor: ExecutionContext): Future[S]
+
   def map[S](f: (T) => S)(implicit executor: ExecutionContext): Future[S]
 
   def castTo[S](implicit executor: ExecutionContext): Future[S] = this.map(v => v.asInstanceOf[S])
