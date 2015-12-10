@@ -1,4 +1,4 @@
-name := "netty"
+name := "nettyHttp"
 
 version := "1.0"
 
