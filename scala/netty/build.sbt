@@ -1,4 +1,4 @@
-name := "worksheet"
+name := "netty"
 
 version := "1.0"
 

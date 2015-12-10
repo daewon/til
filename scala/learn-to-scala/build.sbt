@@ -1,4 +1,4 @@
-name := "til-scala"
+name := "list"
 
 version := "1.0"
 
