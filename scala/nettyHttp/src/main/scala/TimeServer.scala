@@ -6,13 +6,14 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 
 class EchoServerHandler() extends ChannelInboundHandlerAdapter {
-  def unixTs() = (System.currentTimeMillis() / 1000 + 2208988800L).toInt
 
   override def channelActive(ctx: ChannelHandlerContext): Unit = {
     val time: ByteBuf = ctx.alloc().buffer(4)
 
-    time.writeInt(unixTs())
+    val ts = System.currentTimeMillis() / 1000L
+    println(ts)
 
+    time.writeInt((ts + 2208988800L).asInstanceOf[Int])
     val future: ChannelFuture = ctx.writeAndFlush(time)
 
     future.addListener(ChannelFutureListener.CLOSE)
@@ -24,7 +25,7 @@ class EchoServerHandler() extends ChannelInboundHandlerAdapter {
   }
 }
 
-object NettyServer extends App {
+object TimeServer extends App {
   val bossGroup: EventLoopGroup = new NioEventLoopGroup()
   val workerGroup: EventLoopGroup = new NioEventLoopGroup()
 
@@ -32,6 +33,8 @@ object NettyServer extends App {
     val bootstrap = new ServerBootstrap()
     bootstrap.group(bossGroup, workerGroup)
       .channel(classOf[NioServerSocketChannel])
+      .option(ChannelOption.SO_BACKLOG, Int.box(2048))
+      .childOption(ChannelOption.SO_KEEPALIVE, Boolean.box(true))
       .childHandler(new ChannelInitializer[SocketChannel]() {
         override def initChannel(ch: SocketChannel): Unit = {
           val pipe = ch.pipeline()
@@ -39,8 +42,6 @@ object NettyServer extends App {
 
         }
       })
-      .option(ChannelOption.SO_BACKLOG, Int.box(2048))
-      .childOption(ChannelOption.SO_KEEPALIVE, Boolean.box(true))
 
     println("start!")
     val bindFuture = bootstrap.bind(9000).sync()
