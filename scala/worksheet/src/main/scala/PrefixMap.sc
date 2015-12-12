@@ -67,16 +67,16 @@ class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
   }
 
   override def toString() = {
-    map.toString
-//    var kvs = Vector.empty[(String, T)]
-//    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
-//      prefixMap.map.keys.foreach { ch =>
-//        traverse(prefixMap.map(ch), stack :+ ch)
-//      }
-//      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
-//    }
-//    traverse(this, Vector.empty)
-//    kvs.map { case (k, v) => s"$k -> $v" } mkString("PrefixMap(", ", ", ")")
+//    map.toString
+    var kvs = Vector.empty[(String, T)]
+    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
+      prefixMap.map.keys.foreach { ch =>
+        traverse(prefixMap.map(ch), stack :+ ch)
+      }
+      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
+    }
+    traverse(this, Vector.empty)
+    kvs.map { case (k, v) => s"$k -> $v" } mkString("PrefixMap(", ", ", ")")
   }
 }
 
