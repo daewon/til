@@ -1,7 +1,10 @@
 import scala.collection._
+
 object PrefixMap {
   def empty[T] = new PrefixMap[T](mutable.Map.empty)
+
   def withValue[T](value: T) = new PrefixMap[T](mutable.Map.empty, Option(value))
+
   def build[T](kv: (String, T), parent: PrefixMap[T]): PrefixMap[T] = {
     val (key, value) = kv
     if (key.nonEmpty) {
@@ -15,6 +18,7 @@ object PrefixMap {
     }
     parent
   }
+
   def fromSeq[T](kvs: (String, T)*): PrefixMap[T] = {
     if (kvs.nonEmpty) {
       val root = build(kvs.head, PrefixMap.empty)
@@ -25,6 +29,7 @@ object PrefixMap {
     } else PrefixMap.empty
   }
 }
+
 class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
                    var value: Option[T] = None) {
   def apply(ch: Char) = map(ch)
@@ -67,7 +72,7 @@ class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
   }
 
   override def toString() = {
-//    map.toString
+    //    map.toString
     var kvs = Vector.empty[(String, T)]
     def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
       prefixMap.map.keys.foreach { ch =>
