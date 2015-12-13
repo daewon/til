@@ -1,9 +1,32 @@
 import scala.collection._
+import scala.collection.generic.CanBuildFrom
 
 object PrefixMap {
   def empty[T] = new PrefixMap[T](mutable.Map.empty)
 
+  //  def newBuilder[T]: mutable.Builder[(String, T), PrefixMap[T]] =
+  //    new mutable.MapBuilder[String, T, PrefixMap[T]](empty)
   def withValue[T](value: T) = new PrefixMap[T](mutable.Map.empty, Option(value))
+
+  def newBuilder[T] = new mutable.Builder[(String, T), PrefixMap[T]] {
+    var prefixMap = PrefixMap.empty[T]
+
+    override def +=(elem: (String, T)): this.type = {
+      prefixMap += elem
+      this
+    }
+
+    override def result(): PrefixMap[T] = prefixMap
+
+    override def clear(): Unit = prefixMap = PrefixMap.empty[T]
+  }
+
+  implicit def prefixMapCanBuildFrom[T] = new CanBuildFrom[PrefixMap[_], (String, T), PrefixMap[T]] {
+    override def apply(from: PrefixMap[_]): mutable.Builder[(String, T), PrefixMap[T]] = newBuilder
+
+    override def apply(): mutable.Builder[(String, T), PrefixMap[T]] = newBuilder
+  }
+
 
   def build[T](kv: (String, T), parent: PrefixMap[T]): PrefixMap[T] = {
     val (key, value) = kv
@@ -20,18 +43,24 @@ object PrefixMap {
   }
 
   def fromSeq[T](kvs: (String, T)*): PrefixMap[T] = {
-    if (kvs.nonEmpty) {
-      val root = build(kvs.head, PrefixMap.empty)
-      kvs.tail.foreach { case (k, v) =>
-        build(k -> v, root)
-      }
-      root
-    } else PrefixMap.empty
+    val root = PrefixMap.empty[T]
+    kvs.foreach { case (k, v) =>
+      build(k -> v, root)
+    }
+    root
   }
 }
 
-class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
-                   var value: Option[T] = None) {
+class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
+                   var value: Option[T] = None)
+  extends mutable.Map[String, T]
+  with mutable.MapLike[String, T, PrefixMap[T]] {
+  self =>
+
+  override def empty = PrefixMap.empty[T]
+
+  override def newBuilder = PrefixMap.newBuilder[T]
+
   def apply(ch: Char) = map(ch)
 
   def get(str: String): Option[T] = {
@@ -49,12 +78,16 @@ class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
     else currentMap.value
   }
 
-  def remove(key: String): this.type = {
+  override def remove(key: String): Option[T] = {
+    var value = None: Option[T]
     def traverse(str: String, parent: PrefixMap[T]): Unit = {
       if (str.nonEmpty) {
         if (parent.map.contains(str.head)) {
           traverse(str.tail, parent(str.head))
-          if (str.length == 1) parent(str.head).value = None
+          if (str.length == 1) {
+            value = parent(str.head).value
+            parent(str.head).value = None
+          }
         } else throw new RuntimeException("key not found")
 
         if (parent(str.head).map.isEmpty && parent(str.head).value.isEmpty) parent.map.remove(str.head)
@@ -63,12 +96,11 @@ class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
 
     traverse(key, this)
 
-    this
+    value
   }
 
-  def update(key: String, value: T): this.type = {
+  override def update(key: String, value: T): Unit = {
     PrefixMap.build(key -> value, this)
-    this
   }
 
   override def toString() = {
@@ -83,24 +115,61 @@ class PrefixMap[T](private val map: mutable.Map[Char, PrefixMap[T]],
     traverse(this, Vector.empty)
     kvs.map { case (k, v) => s"$k -> $v" } mkString("PrefixMap(", ", ", ")")
   }
-}
 
+  override def +=(kv: (String, T)): this.type = {
+    val (k, v) = kv
+    update(k, v)
+    this
+  }
+
+  override def -=(key: String): this.type = {
+    remove(key)
+    this
+  }
+
+  override def iterator: Iterator[(String, T)] = new Iterator[(String, T)] {
+    var kvs = Vector.empty[(String, T)]
+
+    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
+      prefixMap.map.keys.foreach { ch =>
+        traverse(prefixMap.map(ch), stack :+ ch)
+      }
+      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
+    }
+
+    traverse(self, Vector.empty)
+    lazy val it = kvs.iterator
+
+    override def hasNext: Boolean = it.hasNext
+
+    override def next(): (String, T) = it.next
+  }
+}
 
 PrefixMap.fromSeq("ABC" -> true, "AX" -> true)
 val m = PrefixMap.fromSeq("abc" -> true, "abcd" -> true, "al" -> true, "all" -> true, "xy" -> true)
+val newMap = m.map { kv =>
+  kv._1 -> false
+} // build with CanBuildFrom
+
+val newMap2 = m.filter { case (k, v) =>
+  k.contains("abc")
+} // build with builder
+
 val x = m('x')
 val y = m.get("ab")
-m.update("abc", false)
-m.update("zzzz", true)
-m.remove("abc")
+m += "abc" -> false
+m += "zzzz" -> true
+m -= "abc"
 val z = m.get("abc")
 val k = m.get("abcd")
-//Map("abc" -> true)
-
-//val m = PrefixMap.fromSeq("abc" -> true, "abcd" -> true)
-//m.get("abcd")
-//m.get("abc")
-//
-//m.remove("abcd")
-//m.get("abc")
-//m.get("abcd")
+// test grabege collected
+// 1. PrefixMap with (abc, abed)
+// 2. Remove abc
+// 3. map must removed 4depth('d') just have 3depth element('abc')
+val m2 = PrefixMap.fromSeq("abc" -> true, "abcd" -> true)
+m2.get("abcd")
+m2.get("abc")
+m2.remove("abcd")
+m2.get("abc")
+m2.get("abcd")
