@@ -72,8 +72,10 @@ class PrefixMap[T]
     valueIt ++ restIt
   }
 
-  override def toString() = suffixes.toString
+  // Can't clean_up garbage map
+  //  override def toString() = suffixes.toString
 
+  override def toString = suffixes.toString
 }
 
 PrefixMap("ABC" -> true, "AX" -> true)
@@ -85,13 +87,12 @@ val newMap2 = m.filter { case (k, v) =>
     k.contains("abc")
   } // build with builder
 
-//val y = m.get("ab")
-//m += "abc" -> false
-//m += "zzzz" -> true
-//m -= "abc"
-//val z = m.get("abc")
-//val k = m.get("abcd")
-
+val y = m.get("ab")
+m += "abc" -> false
+m += "zzzz" -> true
+m -= "abc"
+val z = m.get("abc")
+val k = m.get("abcd")
 // test grabege collected
 // 1. PrefixMap with (abc, abed)
 // 2. Remove abc

@@ -4,8 +4,6 @@ import scala.collection.generic.CanBuildFrom
 object PrefixMap {
   def empty[T] = new PrefixMap[T](mutable.Map.empty)
 
-  //  def newBuilder[T]: mutable.Builder[(String, T), PrefixMap[T]] =
-  //    new mutable.MapBuilder[String, T, PrefixMap[T]](empty)
   def withValue[T](value: T) = new PrefixMap[T](mutable.Map.empty, Option(value))
 
   def newBuilder[T] = new mutable.Builder[(String, T), PrefixMap[T]] {
@@ -42,7 +40,7 @@ object PrefixMap {
     parent
   }
 
-  def fromSeq[T](kvs: (String, T)*): PrefixMap[T] = {
+  def apply[T](kvs: (String, T)*): PrefixMap[T] = {
     val root = PrefixMap.empty[T]
     kvs.foreach { case (k, v) =>
       build(k -> v, root)
@@ -103,19 +101,6 @@ class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
     PrefixMap.build(key -> value, this)
   }
 
-  override def toString() = {
-    //    map.toString
-    var kvs = Vector.empty[(String, T)]
-    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
-      prefixMap.map.keys.foreach { ch =>
-        traverse(prefixMap.map(ch), stack :+ ch)
-      }
-      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
-    }
-    traverse(this, Vector.empty)
-    kvs.map { case (k, v) => s"$k -> $v" } mkString("PrefixMap(", ", ", ")")
-  }
-
   override def +=(kv: (String, T)): this.type = {
     val (k, v) = kv
     update(k, v)
@@ -144,18 +129,31 @@ class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
 
     override def next(): (String, T) = it.next
   }
+
+  override def toString = map.toString
+
+  def toString2 = {
+    //    map.toString
+    var kvs = Vector.empty[(String, T)]
+    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
+      prefixMap.map.keys.foreach { ch =>
+        traverse(prefixMap.map(ch), stack :+ ch)
+      }
+      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
+    }
+    traverse(this, Vector.empty)
+    kvs.map { case (k, v) => s"$k -> $v" } mkString("PrefixMap(", ", ", ")")
+  }
 }
 
-PrefixMap.fromSeq("ABC" -> true, "AX" -> true)
-val m = PrefixMap.fromSeq("abc" -> true, "abcd" -> true, "al" -> true, "all" -> true, "xy" -> true)
+PrefixMap("ABC" -> true, "AX" -> true)
+val m = PrefixMap("abc" -> true, "abcd" -> true, "al" -> true, "all" -> true, "xy" -> true)
 val newMap = m.map { kv =>
   kv._1 -> false
 } // build with CanBuildFrom
-
 val newMap2 = m.filter { case (k, v) =>
-  k.contains("abc")
-} // build with builder
-
+    k.contains("abc")
+  } // build with builder
 val x = m('x')
 val y = m.get("ab")
 m += "abc" -> false
@@ -167,9 +165,10 @@ val k = m.get("abcd")
 // 1. PrefixMap with (abc, abed)
 // 2. Remove abc
 // 3. map must removed 4depth('d') just have 3depth element('abc')
-val m2 = PrefixMap.fromSeq("abc" -> true, "abcd" -> true)
+val m2 = PrefixMap("abc" -> true, "abcd" -> true)
 m2.get("abcd")
 m2.get("abc")
 m2.remove("abcd")
 m2.get("abc")
 m2.get("abcd")
+m2
