@@ -1,4 +1,4 @@
-name := "list"
+name := "learnToScala"
 
 version := "1.0"
 

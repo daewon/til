@@ -5,5 +5,6 @@ import scala.collection.mutable.ArrayBuffer
 
 val buf = new ArrayBuffer[Int]
 buf += 1
-val a = buf mapResult { _.toList }
+val a = buf mapResult { _.toVector }
 
+a.result()

@@ -12,7 +12,6 @@ trait Resetable {
   def reset(): Unit = { println("reset") }
 }
 
-
 def cloneAndReset(obj: Clonable with Resetable): Clonable = {
   val cloned = obj.clone()
   obj.reset()
