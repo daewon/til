@@ -14,7 +14,25 @@ object Ls {
 }
 
 sealed trait Ls[+E] {
-  def ::[A >: E](e: A): Ls[A]
+  def foreach(f: E => Unit) = {
+    @tailrec def loop(acc: Ls[E]): Unit = acc match {
+      case Empty =>
+      case Node(head, tail) =>
+        f(head)
+        loop(tail)
+    }
+
+    loop(this)
+  }
+
+  def prepends[A >: E](other: Ls[A]): Ls[A] = other match {
+    case Empty => this
+    case Node(hd, tail) => hd :: prepends(tail)
+  }
+
+  def :::[A >: E](other: Ls[A]): Ls[A] = prepends(other)
+
+  def ::[A >: E](e: A): Ls[A] = Node(e, this)
 
   val size: Int
 
@@ -41,10 +59,13 @@ sealed trait Ls[+E] {
 
 case class Node[+E](head: E, tail: Ls[E]) extends Ls[E] {
   override val size = 1 + tail.size
+
   override def map[R](f: (E) => R): Ls[R] = Node(f(head), tail.map(f))
+
 }
 
 case object Empty extends Ls[Nothing] {
   override val size = 0
+
   override def map[R](f: (Nothing) => R): Ls[R] = this
 }
