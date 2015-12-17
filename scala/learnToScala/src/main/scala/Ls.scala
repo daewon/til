@@ -72,5 +72,5 @@ case class Node[+E](head: E, tail: Ls[E]) extends Ls[E] {
 case object Empty extends Ls[Nothing] {
   override val size = 0
 
-  override def map[R](f: (Nothing) => R): Ls[R] = this
+  override def map[R](f: Nothing => R): Ls[R] = this
 }

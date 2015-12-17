@@ -32,12 +32,40 @@ case class Node[T](value: T) {
 
 object Node {
 
-  /**
-    * @param a
-    * @param b
-    * @tparam T
-    * @return
-    */
+  // inplace reverse
+  def reverse[T](head: Node[T]): Node[T] = {
+    var newHead: Option[Node[T]] = None
+
+    def traverse(current: Node[T], prev: Option[Node[T]]): Unit = {
+      current.next match {
+        case Some(next) => traverse(next, Option(current))
+        case None => newHead = Option(current)
+      }
+
+      current.next = prev
+    }
+
+    traverse(head, None)
+    newHead.get
+  }
+
+  // inplace reverse
+  // 1 -> 2 -> 3 -> 4 -> 5
+  def reverse2[T](head: Node[T]): Node[T] = {
+    var limit = 10
+    var next: Option[Node[T]] = head.next
+    var prev: Option[Node[T]] = None
+    var current = head
+
+    var doNext = true
+    while(doNext || limit > 0) {
+      if (next.isEmpty) doNext = false
+      limit -= 1
+    }
+
+    current
+  }
+
   def append[T](a: Node[T], b: Node[T]) = {
     a.next = Option(b)
     b
@@ -65,8 +93,10 @@ object Node {
     else isEqual && a.next == b.next
   }
 }
-
-Seq(1) == Seq(1)
+val ints = Node.fromSeq(1, 2, 3, 4, 5)
+Node.reverse(ints)
+val ints2 = Node.fromSeq(1, 2, 3, 4, 5)
+Node.reverse2(ints2)
 
 Node.isEqual(
   Node.fromSeq('g', 'e', 'e', 'k', 's', 'a'),
