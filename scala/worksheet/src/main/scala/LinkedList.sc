@@ -1,3 +1,6 @@
+import scala.collection.immutable.Stack
+import scala.collection.mutable
+
 //Input:
 //  list1 = g->e->e->k->s->a
 //  list2 = g->e->e->k->s->b
@@ -51,19 +54,22 @@ object Node {
 
   // inplace reverse
   // 1 -> 2 -> 3 -> 4 -> 5
+  // 5 -> 4 -> 3 -> 2 -> 1
   def reverse2[T](head: Node[T]): Node[T] = {
-    var limit = 10
-    var next: Option[Node[T]] = head.next
-    var prev: Option[Node[T]] = None
-    var current = head
+    type NodeOpt = Option[Node[T]]
 
-    var doNext = true
-    while(doNext || limit > 0) {
-      if (next.isEmpty) doNext = false
-      limit -= 1
+    var prev: NodeOpt = None
+    var current = Option(head)
+    var next: NodeOpt = None
+
+    while (current.isDefined) {
+      next = current.get.next
+      current.get.next = prev
+      prev = current
+      current = next
     }
 
-    current
+    prev.getOrElse(head)
   }
 
   def append[T](a: Node[T], b: Node[T]) = {
@@ -97,15 +103,12 @@ val ints = Node.fromSeq(1, 2, 3, 4, 5)
 Node.reverse(ints)
 val ints2 = Node.fromSeq(1, 2, 3, 4, 5)
 Node.reverse2(ints2)
-
 Node.isEqual(
   Node.fromSeq('g', 'e', 'e', 'k', 's', 'a'),
   Node.fromSeq('g', 'e', 'e', 'k', 's', 'b'))
-
 Node.isEqual(
   Node.fromSeq('g', 'e', 'e', 'k', 's', 'a'),
   Node.fromSeq('g', 'e', 'e', 'k', 's'))
-
 Node.isEqual(
   Node.fromSeq('g', 'e', 'e', 'k', 's'),
   Node.fromSeq('g', 'e', 'e', 'k', 's'))
