@@ -16,7 +16,8 @@ object List {
     else Empty
 }
 
-sealed trait List[+E] extends Monad[List[E]] {
+sealed trait List[+E] extends Monad[E, List] {
+
   def head: E
 
   def tail: List[E]
@@ -74,6 +75,10 @@ sealed trait List[+E] extends Monad[List[E]] {
     case Node(head, tail) if pred(head) => Some(head)
     case Node(_, tail) => tail.find(pred)
   }
+
+  override def flatMap[A](f: (E) => List[A]): List[A] = fold(Empty: List[A]) {
+    case (acc, current) => acc ::: f(current)
+  }
 }
 
 case class Node[+E](val head: E, val tail: List[E]) extends List[E] {
@@ -81,13 +86,7 @@ case class Node[+E](val head: E, val tail: List[E]) extends List[E] {
 
   override def map[R](f: (E) => R): List[R] = Node(f(head), tail.map(f))
 
-  ////  override def flatMap[A](f: (E) => Monad[A]): Monad[A] = fold
-  //  override def flatMap[A](f: E => List[A]): List[A] = fold(Empty: List[A]) {
-  //    case (acc, current) => acc ::: f(current)
-  //  }
-  override def flatMap[A](f: (List[E]) => Monad[A]): Monad[A] = fold(Empty: List[A]) {
-    case (acc, current) => acc ::: f(current)
-  }
+  override def unit[A](a: A): List[A] = List(a)
 }
 
 case object Empty extends List[Nothing] {
@@ -99,5 +98,5 @@ case object Empty extends List[Nothing] {
 
   override def head: Nothing = throw new UnsupportedOperationException("head of empty list")
 
-  //  override def flatMap[A](f: (Nothing) => List[A]): List[A] = Empty
+  override def unit[A](a: A): List[A] = this
 }

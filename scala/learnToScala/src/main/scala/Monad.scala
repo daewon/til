@@ -1,9 +1,9 @@
 package io.daewon.til
 
-trait Monad[+M] {
-//  def unit[A](a: A): Monad[A]
+trait Monad[+M, Cont[_]] {
+  def unit[A](a: A): Cont[A]
 
-  def flatMap[A](f: M => Monad[A]): Monad[A]
+  def flatMap[A](f: M => Cont[A]): Cont[A]
 
-//  def map[A](f: M => A): Monad[A]
+  def map[A](f: M => A): Cont[A]
 }
