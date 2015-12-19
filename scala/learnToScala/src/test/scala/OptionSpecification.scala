@@ -85,5 +85,31 @@ class OptionSpecification extends Specification {
         Option(null) === None
       }
     }
+
+    "be associative" >> {
+      val multiplier: Int => Option[Int] = v => Some(v * v)
+      val divider: Int => Option[Int] = v => Some(v / 2)
+      val original = Some(10)
+
+      original.flatMap(multiplier).flatMap(divider) ===
+        original.flatMap(v => multiplier(v).flatMap(divider))
+    }
+
+    "be left unit" >> {
+      val multiplier: Int => Option[Int] = v => Some(v * v)
+      val item = Some(10).flatMap(multiplier)
+
+      item === multiplier(10)
+    }
+
+    "be identity" >> {
+      val monad = Some(50).flatMap(v => Some(v))
+      monad.flatMap(Option.apply) === monad
+    }
+
+    "be right unit" >> {
+      val value = Some(50).flatMap(v => Some(v))
+      value === Some(50)
+    }
   }
 }

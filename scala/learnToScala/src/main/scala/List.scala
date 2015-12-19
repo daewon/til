@@ -1,7 +1,6 @@
 package io.daewon.til
 
 import scala.annotation.{switch, tailrec}
-import io.daewon.til._
 
 
 // http://mauricio.github.io/2013/11/25/learning-scala-by-building-scala-lists.html
@@ -17,8 +16,9 @@ object List {
     else Empty
 }
 
-sealed trait List[+E] {
+sealed trait List[+E] extends Monad[List[E]] {
   def head: E
+
   def tail: List[E]
 
   def foreach(f: E => Unit) = {
@@ -55,9 +55,10 @@ sealed trait List[+E] {
 
   def map[R](f: E => R): List[R]
 
-  def flatMap[B](f: E => List[B]): List[B] = fold(Empty: List[B]) {
-    case (acc, current) => acc ::: f(current)
-  }
+  //  override def flatMap[A](f: (E) => Monad[A]): Monad[A] = ???
+  //  def flatMap[B](f: E => List[B]): List[B] = fold(Empty: List[B]) {
+  //    case (acc, current) => acc ::: f(current)
+  //  }
 
   @tailrec final def fold[A](acc: A)(f: (A, E) => A): A = (this: @switch) match {
     case Node(head, tail) => tail.fold(f(acc, head))(f)
@@ -79,6 +80,14 @@ case class Node[+E](val head: E, val tail: List[E]) extends List[E] {
   override val size = 1 + tail.size
 
   override def map[R](f: (E) => R): List[R] = Node(f(head), tail.map(f))
+
+  ////  override def flatMap[A](f: (E) => Monad[A]): Monad[A] = fold
+  //  override def flatMap[A](f: E => List[A]): List[A] = fold(Empty: List[A]) {
+  //    case (acc, current) => acc ::: f(current)
+  //  }
+  override def flatMap[A](f: (List[E]) => Monad[A]): Monad[A] = fold(Empty: List[A]) {
+    case (acc, current) => acc ::: f(current)
+  }
 }
 
 case object Empty extends List[Nothing] {
@@ -89,4 +98,6 @@ case object Empty extends List[Nothing] {
   override def tail: Node[Nothing] = throw new UnsupportedOperationException("tail of empty list")
 
   override def head: Nothing = throw new UnsupportedOperationException("head of empty list")
+
+  //  override def flatMap[A](f: (Nothing) => List[A]): List[A] = Empty
 }
