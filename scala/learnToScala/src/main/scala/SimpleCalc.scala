@@ -66,6 +66,11 @@ object SimpleCalc {
       phrase(expr)(tokens)
     }
 
+    def parse2(s: String) = {
+      val tokens = new lexical.Scanner(s)
+      phrase(expr)(tokens)
+    }
+
     def apply(s: String): Expr = parse(s) match {
       case Success(tree, _) => tree
       case e: NoSuccess => throw new IllegalArgumentException("Bad syntax: " + s)
