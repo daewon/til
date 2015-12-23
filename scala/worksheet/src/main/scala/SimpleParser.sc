@@ -16,16 +16,13 @@ object TestParser extends JavaTokenParsers {
     case f ~ ls => ls.foldLeft(f.asInstanceOf[Expr]) { case (c, a) => Add(c, a) }
   }
 
-  def plus = "+" ~> term
-
   def term: Parser[D] = factor ~ rep(times) ^^ {
     case f ~ ls => ls.foldLeft(f.asInstanceOf[Expr]) { case (c, a) => Mul(c, a) }
   }
 
+  def plus = "+" ~> term
   def times = "*" ~> factor
-
   def factor: Parser[D] = fpn | "(" ~> expr <~ ")"
-
   def fpn: Parser[D] = floatingPointNumber ^^ { case n => Num(n.toInt) }
 
   def parse(str: String) = parseAll(expr, str) match {
@@ -34,9 +31,10 @@ object TestParser extends JavaTokenParsers {
   }
 }
 
-TestParser.parse("1")
-TestParser.parse("3 * 2 + 1")
-TestParser.parse("3 + 2 * 1")
+TestParser.parse("1 + 2 * 3 + 4")
+//TestParser.parse("3 * 2 + 1")
+//TestParser.parse("(3 + 2) * 1")
+//TestParser.parse("3 + 2 * 1")
 
 object ABParser extends JavaTokenParsers {
 
