@@ -53,11 +53,19 @@ def traverse4[T](root: Node[T]): List[List[Node[T]]] = {
 
   lss.reverse
 }
+
+@tailrec def traverse5[T](parents: List[Node[T]], acc: List[List[Node[T]]] = Nil): List[List[Node[T]]] = {
+  val childNodes = parents.flatMap(_.childNodes)
+
+  if (childNodes.isEmpty) acc
+  else traverse5(childNodes, childNodes :: acc)
+}
+
 def levelOrder[T](root: Node[T]) = traverse(List(root))
 def levelOrder2[T](root: Node[T]) = traverse2(List(root))
 def levelOrder3[T](root: Node[T]) = traverse3(root)
 def levelOrder4[T](root: Node[T]) = traverse4(root)
-
+def levelOrder5[T](root: Node[T]) = traverse5(List(root), List(List(root))).reverse
 val root = Node(1,
   Node(2,
     Node(3,
@@ -70,11 +78,11 @@ val ls = levelOrder(root)
 val ls2 = levelOrder2(root)
 val ls3 = levelOrder3(root)
 val ls4 = levelOrder4(root)
+val ls5 = levelOrder5(root)
 ls.size == 5
 ls(0).size == 1
 ls(1).size == 2
 ls(2).size == 2
 ls(3).size == 1
 ls(4).size == 1
-
 
