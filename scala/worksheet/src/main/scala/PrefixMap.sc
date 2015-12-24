@@ -1,31 +1,21 @@
 import scala.collection._
 import scala.collection.generic.CanBuildFrom
-
 object PrefixMap {
   def empty[T] = new PrefixMap[T](mutable.Map.empty)
-
   def withValue[T](value: T) = new PrefixMap[T](mutable.Map.empty, Option(value))
-
   def newBuilder[T] = new mutable.Builder[(String, T), PrefixMap[T]] {
     var prefixMap = PrefixMap.empty[T]
-
     override def +=(elem: (String, T)): this.type = {
       prefixMap += elem
       this
     }
-
     override def result(): PrefixMap[T] = prefixMap
-
     override def clear(): Unit = prefixMap = PrefixMap.empty[T]
   }
-
   implicit def prefixMapCanBuildFrom[T] = new CanBuildFrom[PrefixMap[_], (String, T), PrefixMap[T]] {
     override def apply(from: PrefixMap[_]): mutable.Builder[(String, T), PrefixMap[T]] = newBuilder
-
     override def apply(): mutable.Builder[(String, T), PrefixMap[T]] = newBuilder
   }
-
-
   def build[T](kv: (String, T), parent: PrefixMap[T]): PrefixMap[T] = {
     val (key, value) = kv
     if (key.nonEmpty) {
@@ -112,18 +102,36 @@ class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
     this
   }
 
-  override def iterator: Iterator[(String, T)] = new Iterator[(String, T)] {
-    var kvs = Vector.empty[(String, T)]
+  def iterator2: Iterator[(String, T)] = new Iterator[(String, T)] {
+    val current = value.iterator.map("" -> _)
+    val subs = for {
+      (k, sub) <- self.map.iterator
+      (c, v) <- sub.iterator
+    } yield (k + c) -> v
 
-    def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
-      prefixMap.map.keys.foreach { ch =>
-        traverse(prefixMap.map(ch), stack :+ ch)
+    val iter = current ++ subs
+
+    override def hasNext: Boolean = iter.hasNext
+
+    override def next(): (String, T) = iter.next
+  }
+
+  override def iterator: Iterator[(String, T)] = new Iterator[(String, T)] {
+    lazy val kvsIterator = {
+      var kvs = Vector.empty[(String, T)]
+      def traverse(prefixMap: PrefixMap[T], stack: Vector[Char]): Unit = {
+        prefixMap.map.keys.foreach { ch =>
+          traverse(prefixMap.map(ch), stack :+ ch)
+        }
+
+        if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
       }
-      if (prefixMap.value.isDefined) kvs = (stack.mkString, prefixMap.value.get) +: kvs
+
+      traverse(self, Vector.empty)
+      kvs
     }
 
-    traverse(self, Vector.empty)
-    lazy val it = kvs.iterator
+    lazy val it = kvsIterator.iterator
 
     override def hasNext: Boolean = it.hasNext
 
