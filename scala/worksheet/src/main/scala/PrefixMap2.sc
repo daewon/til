@@ -75,7 +75,7 @@ class PrefixMap[T]
   // Can't clean_up garbage map
   //  override def toString() = suffixes.toString
 
-  override def toString = suffixes.toString
+//  override def toString = suffixes.toString
 }
 
 PrefixMap("ABC" -> true, "AX" -> true)

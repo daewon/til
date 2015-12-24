@@ -1,5 +1,8 @@
+// http://mauricio.github.io/2015/01/06/building-a-prefix-tree-in-scala.html
+
 import scala.collection._
 import scala.collection.generic.CanBuildFrom
+
 object PrefixMap {
   def empty[T] = new PrefixMap[T](mutable.Map.empty)
   def withValue[T](value: T) = new PrefixMap[T](mutable.Map.empty, Option(value))
@@ -104,10 +107,11 @@ class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
 
   def iterator2: Iterator[(String, T)] = new Iterator[(String, T)] {
     val current = value.iterator.map("" -> _)
+
     val subs = for {
       (k, sub) <- self.map.iterator
-      (c, v) <- sub.iterator
-    } yield (k + c) -> v
+      (s, v) <- sub.iterator
+    } yield (k +: s) -> v
 
     val iter = current ++ subs
 
@@ -138,7 +142,7 @@ class PrefixMap[T](var map: mutable.Map[Char, PrefixMap[T]],
     override def next(): (String, T) = it.next
   }
 
-  override def toString = map.toString
+//  override def toString = map.toString
 
   def toString2 = {
     //    map.toString
