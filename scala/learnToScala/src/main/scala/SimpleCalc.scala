@@ -1,6 +1,22 @@
 package io.daewon
 
-import scala.util.parsing.combinator.syntactical._
+/**
+  http://www.henkelmann.eu/2011/1/13/an_introduction_to_scala_parser_combinators
+  http://labs.enonic.com/articles/scalas-regular-expression-parser
+  http://jim-mcbeath.blogspot.kr/2008/09/scala-parser-combinators.html#precedencerevisited
+  http://stackoverflow.com/questions/11533547/operator-precedence-with-scala-parser-combinators
+  http://kufli.blogspot.kr/2015/01/scala-parser-combinators-sql-parser.html
+  https://dzone.com/articles/create-a-programming-language-with-scala-parser-co
+  http://jim-mcbeath.blogspot.kr/2008/09/scala-parser-combinators.html#basic
+  http://berniepope.id.au/docs/scala_parser_combinators.pdf
+  http://www.donroby.com/wp/scala/parsing-expressions-with-scala-parser-combinators-2/
+  https://www.cs.helsinki.fi/u/wikla/OTS/Sisalto/examples/html/ch31.html#sec1
+
+  http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.142.5002&rep=rep1&type=pdf
+
+  http://myltsev.name/ScalaDays2014/#/
+  http://lihaoyi.github.io/fastparse/
+  */
 
 object SimpleCalc {
 
