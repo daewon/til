@@ -86,3 +86,30 @@ ls(2).size == 2
 ls(3).size == 1
 ls(4).size == 1
 
+val root2 = Node(1,
+  Node(2,
+    Node(4,
+      Node(6,
+        Node(7)))),
+  Node(3,
+    Node(5))
+)
+
+def foreach[T](root: Node[T])(f: Node[T] => Unit): Unit = {
+  var ls = List(root)
+
+  while(ls.nonEmpty) {
+    val node = ls.head
+    ls = ls.tail
+    f(node)
+
+    node.childNodes.reverse.foreach { child =>
+      ls = child :: ls
+    }
+  }
+}
+
+
+foreach(root2) { node =>
+  println(node)
+}
