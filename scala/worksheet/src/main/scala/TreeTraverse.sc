@@ -86,30 +86,35 @@ ls(2).size == 2
 ls(3).size == 1
 ls(4).size == 1
 
-val root2 = Node(1,
-  Node(2,
-    Node(4,
-      Node(6,
-        Node(7)))),
-  Node(3,
-    Node(5))
+
+// https://en.wikibooks.org/wiki/A-level_Computing_2009/AQA/Problem_Solving,_Programming,_Operating_Systems,_Databases_and_Networking/Programming_Concepts/Tree_traversal_algorithms_for_a_binary_tree
+// https://en.wikipedia.org/wiki/Tree_traversal
+val root2 = Node('F',
+  Node('B',
+    Node('A'),
+    Node('D',
+      Node('C'),
+      Node('E'))),
+  Node('G',
+    Node('I',
+      Node('H')))
 )
 
-def foreach[T](root: Node[T])(f: Node[T] => Unit): Unit = {
+def preOrder[T](root: Node[T])(f: Node[T] => Unit): Unit = {
   var ls = List(root)
 
-  while(ls.nonEmpty) {
-    val node = ls.head
-    ls = ls.tail
-    f(node)
-
-    node.childNodes.reverse.foreach { child =>
-      ls = child :: ls
-    }
+  while (ls.nonEmpty) {
+    val hd :: tl = ls
+    f(hd)
+    ls = hd.childNodes.toList ::: tl
   }
 }
 
-
-foreach(root2) { node =>
-  println(node)
+def aggregate[T](root: Node[T], higher: (Node[T]) => ((Node[T]) => Unit) => Unit): String = {
+  var ls = List.empty[T]
+  higher(root) { node => ls = node.value :: ls }
+  println(ls.reverse.mkString)
+  ls.reverse.mkString
 }
+aggregate(root2, preOrder[Char]) == "FBADCEGIH"
+
