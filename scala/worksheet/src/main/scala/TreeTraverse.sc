@@ -1,6 +1,6 @@
 import scala.annotation.tailrec
 
-case class Node[T](value: T, childNodes: Node[T]*) {
+case class Node[+T](value: T, childNodes: Node[T]*) {
   override def toString = value.toString
 }
 
@@ -87,8 +87,42 @@ ls(3).size == 1
 ls(4).size == 1
 
 
-// https://en.wikibooks.org/wiki/A-level_Computing_2009/AQA/Problem_Solving,_Programming,_Operating_Systems,_Databases_and_Networking/Programming_Concepts/Tree_traversal_algorithms_for_a_binary_tree
 // https://en.wikipedia.org/wiki/Tree_traversal
+def preOrder[T](root: Node[T])(f: Node[T] => Unit): Unit = {
+  var ls = List(root)
+
+  while (ls.nonEmpty) {
+    val hd :: tl = ls
+    f(hd)
+    ls = hd.childNodes.toList ::: tl
+  }
+}
+def postOrder[T](root: Node[T])(f: Node[T] => Unit): Unit = {
+  val marker = None
+  var parents: List[Any] = Nil
+  var childs: List[Any] = List(root)
+
+  while (childs.nonEmpty) {
+    val hd :: tl = childs
+
+    hd match {
+      case node: Node[_] =>
+        if (node.childNodes.nonEmpty) {
+          parents = node :: parents
+          childs = node.childNodes.toList ::: (marker :: tl)
+        } else {
+          childs = tl
+          f(node.asInstanceOf[Node[T]])
+        }
+      case None =>
+        childs = tl
+        if (parents.nonEmpty) {
+          f(parents.head.asInstanceOf[Node[T]])
+          parents = parents.tail
+        }
+    }
+  }
+}
 val root2 = Node('F',
   Node('B',
     Node('A'),
@@ -99,17 +133,6 @@ val root2 = Node('F',
     Node('I',
       Node('H')))
 )
-
-def preOrder[T](root: Node[T])(f: Node[T] => Unit): Unit = {
-  var ls = List(root)
-
-  while (ls.nonEmpty) {
-    val hd :: tl = ls
-    f(hd)
-    ls = hd.childNodes.toList ::: tl
-  }
-}
-
 def aggregate[T](root: Node[T], higher: (Node[T]) => ((Node[T]) => Unit) => Unit): String = {
   var ls = List.empty[T]
   higher(root) { node => ls = node.value :: ls }
@@ -117,4 +140,5 @@ def aggregate[T](root: Node[T], higher: (Node[T]) => ((Node[T]) => Unit) => Unit
   ls.reverse.mkString
 }
 aggregate(root2, preOrder[Char]) == "FBADCEGIH"
+aggregate(root2, postOrder[Char]) == "ACEDBHIGF"
 
