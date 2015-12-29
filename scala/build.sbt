@@ -25,6 +25,8 @@ lazy val learnToScala = project.settings(commonSettings: _*)
 
 lazy val worksheet = project.settings(commonSettings: _*)
 
-lazy val nettyHttp = project.settings(commonSettings: _*)
+lazy val netty = project.settings(commonSettings: _*)
+
+lazy val rapidoidHttp = project.settings(commonSettings: _*)
 
 
