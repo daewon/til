@@ -4,20 +4,21 @@ import scala.util.Random
 //
 val heap = {
   val heap = new Heap[Int]()
-  Random.shuffle(0 to 100) foreach { n => heap.add(n) }
-  (0 to 99) foreach { n =>
+  Random.shuffle(1 to 1000) foreach { n => heap.add(n) }
+  (1 to 500) foreach { n =>
     heap.pop
   }
   heap
 }
-
 class Heap[A] {
   private val buffer = new mutable.ArrayBuffer[A]()
   def add(elem: A)(implicit ec: Numeric[A]): Unit = {
     buffer.append(elem)
     bubbleUp(lastIndex)
   }
+
   def peek = buffer(0)
+
   def pop(implicit ec: Numeric[A]) = {
     if (buffer.nonEmpty) {
       swap(0, lastIndex)
@@ -25,11 +26,13 @@ class Heap[A] {
       bubbleDown(0)
     }
   }
+
   def swap(a: Int, b: Int) = {
     val tmp = buffer(a)
     buffer(a) = buffer(b)
     buffer(b) = tmp
   }
+
   private def bubbleDown(index: Int)(implicit ec: Numeric[A]): Unit = {
     val (hasLeft, hasRight) = (isValidLeft(index), isValidRight(index))
     (hasLeft, hasRight) match {
@@ -38,22 +41,12 @@ class Heap[A] {
           case -1 | 0 =>
             if (ec.compare(buffer(index), buffer(leftIndex(index))) > 0) {
               swap(index, leftIndex(index))
-              //              try {
               bubbleDown(leftIndex(index))
-              //              } catch {
-              //                case e: Exception =>
-              //                  println(leftIndex(index))
-              //              }
             }
           case _ =>
             if (ec.compare(buffer(index), buffer(rightIndex(index))) > 0) {
               swap(index, rightIndex(index))
-              try {
-                bubbleDown(rightIndex(index))
-              } catch {
-                case e: Exception =>
-                //                  println(leftIndex(index))
-              }
+              bubbleDown(rightIndex(index))
             }
         }
 
