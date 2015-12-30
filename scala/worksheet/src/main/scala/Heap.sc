@@ -1,3 +1,4 @@
+import scala.annotation.tailrec
 import scala.collection._
 import scala.util.Random
 
@@ -32,7 +33,7 @@ class Heap[A] {
     peek
   }
 
-  private def bubbleDown(pIndex: Int)(implicit ec: Numeric[A]): Unit = {
+  @tailrec private def bubbleDown(pIndex: Int)(implicit ec: Numeric[A]): Unit = {
     val (hasLeft, hasRight) = (isValidLeft(pIndex), isValidRight(pIndex))
 
     val opt = (hasLeft, hasRight) match {
@@ -46,15 +47,17 @@ class Heap[A] {
       case _ => None
     }
 
-    opt.foreach { targetIndex =>
-      if (ec.compare(buffer(pIndex), buffer(targetIndex)) > 0) {
-        swap(buffer, pIndex, targetIndex)
-        bubbleDown(targetIndex)
-      }
+    opt match {
+      case Some(targetIndex) =>
+        if (ec.compare(buffer(pIndex), buffer(targetIndex)) > 0) {
+          swap(buffer, pIndex, targetIndex)
+          bubbleDown(targetIndex)
+        }
+      case None => // do nothing
     }
   }
 
-  private def bubbleUp(index: Int)(implicit ec: Numeric[A]): Unit = {
+  @tailrec private def bubbleUp(index: Int)(implicit ec: Numeric[A]): Unit = {
     if (buffer.length > 1 && index > 0) {
       val pIndex = parentIndex(index)
 
