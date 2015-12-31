@@ -27,6 +27,6 @@ lazy val worksheet = project.settings(commonSettings: _*)
 
 lazy val netty = project.settings(commonSettings: _*)
 
-lazy val rapidoidHttp = project.settings(commonSettings: _*)
+lazy val nio = project.settings(commonSettings: _*)
 
 

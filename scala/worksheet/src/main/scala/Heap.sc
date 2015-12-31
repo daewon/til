@@ -2,8 +2,9 @@ import scala.annotation.tailrec
 import scala.collection._
 import scala.util.Random
 
-val testHeap = {
-  val heap = new Heap[Int]()
+
+val testMaxHeap = {
+  val heap = new MinHeap[Int]()
   Random.shuffle(1 to 1000) foreach { n => heap.push(n) }
   (1 to 500) foreach { n =>
     heap.pop
@@ -13,35 +14,39 @@ val testHeap = {
 /**
   * Heap data structure from scratch
   */
-class Heap[A] {
+class MinHeap[A](implicit ord: Numeric[A]) extends Heap[A](ord)
+
+class MaxHeap[A](implicit ord: Numeric[A]) extends Heap[A](ord) {
+  override def compare(a: A, b: A): Int = super.compare(a, b) * -1
+}
+
+abstract class Heap[A](comparer: Numeric[A]) {
+  def compare(a: A, b: A): Int = comparer.compare(a, b)
   import Heap._
+
   private val buffer = new mutable.ArrayBuffer[A]()
-  def push(elem: A)(implicit ec: Numeric[A]): Unit = {
+
+  def push(elem: A): Unit = {
     buffer.append(elem)
     bubbleUp(lastIndex)
   }
 
   def peek = buffer(0)
 
-  def pop(implicit ec: Numeric[A]): A = {
+  def pop() = {
     if (buffer.nonEmpty) {
       swap(buffer, 0, lastIndex)
       buffer.remove(lastIndex)
       bubbleDown(0)
     }
-
-    peek
   }
 
-  @tailrec private def bubbleDown(pIndex: Int)(implicit ec: Numeric[A]): Unit = {
-    val (hasLeft, hasRight) = (isValidLeft(pIndex), isValidRight(pIndex))
-
-    val opt = (hasLeft, hasRight) match {
+  @tailrec private def bubbleDown(pIndex: Int): Unit = {
+    val opt = (hasLeft(pIndex), hasRight(pIndex)) match {
       case (true, true) =>
-        ec.compare(buffer(leftIndex(pIndex)), buffer(rightIndex(pIndex))) match {
-          case -1 => Option(leftIndex(pIndex))
+        compare(buffer(leftIndex(pIndex)), buffer(rightIndex(pIndex))) match {
+          case -1 | 0 => Option(leftIndex(pIndex))
           case 1 => Option(rightIndex(pIndex))
-          case _ => None
         }
       case (true, false) => Option(leftIndex(pIndex))
       case _ => None
@@ -49,7 +54,7 @@ class Heap[A] {
 
     opt match {
       case Some(targetIndex) =>
-        if (ec.compare(buffer(pIndex), buffer(targetIndex)) > 0) {
+        if (compare(buffer(pIndex), buffer(targetIndex)) > 0) {
           swap(buffer, pIndex, targetIndex)
           bubbleDown(targetIndex)
         }
@@ -57,15 +62,12 @@ class Heap[A] {
     }
   }
 
-  @tailrec private def bubbleUp(index: Int)(implicit ec: Numeric[A]): Unit = {
-    if (buffer.length > 1 && index > 0) {
+  @tailrec private def bubbleUp(index: Int): Unit = {
+    if (index > 0) {
       val pIndex = parentIndex(index)
 
-      val current = buffer(index)
-      val parent = buffer(pIndex)
-
-      ec.compare(current, parent) match {
-        case -1 =>
+      compare(buffer(index), buffer(pIndex)) match {
+        case -1 => // current, parent
           swap(buffer, pIndex, index)
           bubbleUp(pIndex)
         case _ => // do nothing
@@ -80,9 +82,9 @@ class Heap[A] {
     case _ => index / 2
   }
 
-  def isValidLeft(index: Int): Boolean = leftIndex(index) <= lastIndex
+  def hasLeft(index: Int): Boolean = leftIndex(index) <= lastIndex
 
-  def isValidRight(index: Int): Boolean = rightIndex(index) <= lastIndex
+  def hasRight(index: Int): Boolean = rightIndex(index) <= lastIndex
 
   def leftIndex(index: Int): Int = index * 2 + 1
 
