@@ -1,7 +1,7 @@
 package io.daewon.async
 
 import scala.concurrent.ExecutionContext
-import scala.util._
+import io.daewon.util._
 
 trait Future[+A] {
   def isCompleted: Boolean

@@ -1,8 +1,9 @@
 package io.daewon.async
 
 
+import io.daewon.util._
+
 import scala.concurrent.ExecutionContext
-import scala.util._
 
 object CurrentThreadExecutionContext extends ExecutionContext {
   def execute(runnable: Runnable): Unit = runnable.run()

@@ -1,9 +1,9 @@
 package io.daewon.async
 
+import io.daewon.util._
 import org.specs2.mutable.Specification
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.{Failure, Success}
 
 class DefaultFutureSpecification extends Specification {
   implicit val executionContext = CurrentThreadExecutionContext
@@ -16,7 +16,7 @@ class DefaultFutureSpecification extends Specification {
       future.onSuccess { case value => items += value }
       future.complete(Success("some-value"))
 
-      items === List("some-value")
+      items === ArrayBuffer("some-value")
       future.isCompleted must beTrue
     }
 
@@ -27,7 +27,8 @@ class DefaultFutureSpecification extends Specification {
       future.complete(Success("some-value"))
       future.onSuccess { case value => items += value }
 
-      items === List("some-value")
+      items === ArrayBuffer("some-value")
+      true
     }
 
     "correctly execute the many callbacks registered" in {
@@ -39,7 +40,8 @@ class DefaultFutureSpecification extends Specification {
       future.onSuccess { case value => items += value }
       future.complete(Success("some-value"))
 
-      items === List("some-value", "some-value", "some-value")
+      items === ArrayBuffer("some-value", "some-value", "some-value")
+      true
     }
 
     "map the value into something else" in {

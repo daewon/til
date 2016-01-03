@@ -1,8 +1,7 @@
 package io.daewon.async
 
 import org.specs2.mutable.Specification
-
-import scala.util.{Failure, Try}
+import io.daewon.util._
 
 class PromiseSpecification extends Specification {
 

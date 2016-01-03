@@ -1,6 +1,6 @@
 package io.daewon.async
 
-import scala.util._
+import io.daewon.util._
 
 /**
   * http://mauricio.github.io/2014/05/01/scala-promises-futures-memcached-and-netty-having-fun.html
