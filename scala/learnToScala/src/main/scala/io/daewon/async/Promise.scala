@@ -8,7 +8,7 @@ import scala.util._
   */
 case class Promise[A]() {
   @volatile private var result: Try[A] = null
-  private val internalFuture = new DefaultFuture[A]()
+  private lazy val internalFuture = new DefaultFuture[A]()
 
   def isCompleted: Boolean = result != null
 
@@ -28,7 +28,7 @@ case class Promise[A]() {
         false
       } else {
         this.result = result
-        this.internalFuture.complete(result) // firing the future callbacks
+        this.internalFuture.complete(result)
         true
       }
     }
@@ -41,7 +41,6 @@ case class Promise[A]() {
   def failure(ex: Throwable): this.type = complete(Failure(ex))
 
   def tryFailure(ex: Throwable): Boolean = tryComplete(Failure(ex))
-
 
   def future: Future[A] = internalFuture
 }

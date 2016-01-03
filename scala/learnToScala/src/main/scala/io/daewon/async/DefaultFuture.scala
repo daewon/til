@@ -2,79 +2,74 @@ package io.daewon.async
 
 
 import scala.concurrent.ExecutionContext
-import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
+import scala.util._
 
 object CurrentThreadExecutionContext extends ExecutionContext {
-
   def execute(runnable: Runnable): Unit = runnable.run()
 
   def reportFailure(t: Throwable): Unit = t.printStackTrace()
-
 }
 
 class DefaultFuture[A] extends Future[A] {
 
   case class FutureCallback(func: Try[A] => Any, ec: ExecutionContext)
 
-  @volatile private var result: Try[A] = null
-  private var callbacks = Vector.empty[FutureCallback]
+  object status {
+    @volatile var value: Try[A] = null
+    var callbacks = Vector.empty[FutureCallback]
+  }
 
-  override def isCompleted: Boolean = result != null
+  override def isCompleted: Boolean = status.value != null
 
   override def value: Option[Try[A]] = this.isCompleted match {
-    case true => Some(result)
+    case true => Option(status.value)
     case false => None
   }
 
   def complete(_value: Try[A]): Unit = _value match {
-    case null => throw new IllegalStateException("A future can't be complete with null")
+    case null => throw new IllegalStateException("A Future can't be completed with null")
     case _ => synchronized {
-      if (!this.isCompleted) {
-        result = _value
-        fireCallbacks()
-      }
+      if (this.isCompleted) throw new IllegalStateException("Promise already completed.")
+      status.value = _value
+      fireCallbacks()
     }
   }
 
-  def flatMap[S](f: (A) => Future[S])(implicit executor: ExecutionContext): Future[S] = {
-    val p = Promise[S]()
-    onComplete {
-      case Success(v) => try {
-        f(v).onComplete(p.complete)
-      } catch {
-        case NonFatal(e) => p.failure(e)
-      }
-      case Failure(e) => p.failure(e)
+  override def flatMap[B](f: A => Future[B])(implicit ec: ExecutionContext): Future[B] = {
+    val p = Promise[B]()
+    this onComplete {
+      case Success(v) => f(v) onComplete p.complete
+      case Failure(ex) => p.failure(ex)
     }
     p.future
   }
 
-  def map[S](f: (A) => S)(implicit executor: ExecutionContext): Future[S] = {
-    val p = Promise[S]()
-    onComplete { v => p complete (v map f) }
+  override def map[B](f: A => B)(implicit ec: ExecutionContext): Future[B] = {
+    val p = Promise[B]()
+    this onComplete {
+      v => p complete (v map f)
+    }
     p.future
   }
 
-  override def onComplete[U](f: (Try[A]) => U)(implicit ec: ExecutionContext): Unit = {
+  override def onComplete[U](f: Try[A] => U)(implicit ec: ExecutionContext): Unit = {
     val callback = FutureCallback(f, ec)
-    this.synchronized {
+    this.status.synchronized {
       this.isCompleted match {
         case true => fireCallback(callback)
-        case false => callbacks = callback +: callbacks
+        case false => status.callbacks = callback +: status.callbacks
       }
     }
   }
 
-  private def fireCallback(cb: FutureCallback): Unit = {
-    cb.ec.execute(new Runnable {
-      override def run(): Unit = cb.func(result)
+  private def fireCallback(futureCallback: FutureCallback): Unit = {
+    futureCallback.ec.execute(new Runnable {
+      override def run(): Unit = futureCallback.func(status.value)
     })
   }
 
   private def fireCallbacks(): Unit = {
-    callbacks.foreach(fireCallback)
-    callbacks = Vector.empty[FutureCallback]
+    status.callbacks.foreach(fireCallback)
+    status.callbacks = Vector.empty[FutureCallback]
   }
-
 }
