@@ -56,11 +56,6 @@ sealed trait List[+E] extends Monad[E, List] {
 
   def map[R](f: E => R): List[R]
 
-  //  override def flatMap[A](f: (E) => Monad[A]): Monad[A] = ???
-  //  def flatMap[B](f: E => List[B]): List[B] = fold(Empty: List[B]) {
-  //    case (acc, current) => acc ::: f(current)
-  //  }
-
   @tailrec final def fold[A](acc: A)(f: (A, E) => A): A = (this: @switch) match {
     case Node(head, tail) => tail.fold(f(acc, head))(f)
     case Empty => acc
