@@ -1,4 +1,4 @@
-package io.daewon.til
+package io.daewon.util
 
 object Option {
   def apply[A](e: A): Option[A] = if (e != null) Some(e) else None

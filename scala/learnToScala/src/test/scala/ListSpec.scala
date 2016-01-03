@@ -1,9 +1,9 @@
-package io.daewon.til
+package io.daewon.util
 
 import org.specs2.mutable.Specification
 import scala.collection.mutable.ListBuffer
 
-import io.daewon.til._
+import io.daewon.util._
 
 class ListSpecification extends Specification {
   "List Specifications" >> {

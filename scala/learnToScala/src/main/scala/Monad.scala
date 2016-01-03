@@ -1,4 +1,4 @@
-package io.daewon.til
+package io.daewon.util
 
 trait Monad[+M, Cont[_]] {
   def unit[A](a: A): Cont[A]

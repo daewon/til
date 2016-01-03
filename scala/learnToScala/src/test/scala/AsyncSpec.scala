@@ -38,9 +38,7 @@ class PromiseSpecification extends Specification {
 
     "should not accept null as a value" in {
       val promise = Promise[String]()
-      promise.complete(null) must throwA[IllegalArgumentException]
+      promise.complete(null) must throwA[IllegalStateException]
     }
   }
 }
-
-

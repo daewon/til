@@ -1,4 +1,4 @@
-import io.daewon.til._
+import io.daewon.util._
 import org.specs2.mutable.Specification
 
 import scala.collection.mutable.ListBuffer

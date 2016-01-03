@@ -1,4 +1,4 @@
-package io.daewon.til
+package io.daewon.util
 
 import scala.annotation.{switch, tailrec}
 
