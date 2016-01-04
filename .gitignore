@@ -1,4 +1,7 @@
 # Created by https://www.gitignore.io/api/scala,intellij,sbt
+# temp
+*~
+#*
 
 ### Scala ###
 *.class
