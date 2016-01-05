@@ -29,11 +29,12 @@ class DefaultFuture[A] extends Future[A] {
 
   def complete(_value: Try[A]): Unit = _value match {
     case null => throw new IllegalStateException("A Future can't be completed with null")
-    case _ => synchronized {
+    case _ =>
       if (this.isCompleted) throw new IllegalStateException("Promise already completed.")
-      status.value = _value
-      fireCallbacks()
-    }
+      synchronized {
+        status.value = _value
+        fireCallbacks()
+      }
   }
 
   override def flatMap[B](f: A => Future[B])(implicit ec: ExecutionContext): Future[B] = {
