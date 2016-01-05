@@ -13,7 +13,7 @@ case class Promise[A]() {
   def isCompleted: Boolean = result != null
 
   def value: Try[A] =
-    if (isCompleted) result
+    if (this.isCompleted) result
     else throw new IllegalStateException("This promise is not completed yet")
 
   def complete(_result: Try[A]): this.type =
@@ -23,14 +23,11 @@ case class Promise[A]() {
   def tryComplete(result: Try[A]): Boolean = {
     if (result == null) throw new IllegalStateException("result can't be null")
 
-    synchronized {
-      if (isCompleted) {
-        false
-      } else {
-        this.result = result
-        this.internalFuture.complete(result)
-        true
-      }
+    if (isCompleted) false
+    else synchronized {
+      this.result = result
+      this.internalFuture.complete(result)
+      true
     }
   }
 
