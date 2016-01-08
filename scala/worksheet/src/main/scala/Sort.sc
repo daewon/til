@@ -1,4 +1,3 @@
-
 import scala.util.Random
 
 def quickPoor(arr: Array[Int], s: Int, e: Int): Array[Int] = {
@@ -26,8 +25,7 @@ def quickPoor(arr: Array[Int], s: Int, e: Int): Array[Int] = {
     if (sIndex == eIndex) {
       quickPoor(arr, s, sIndex - 1)
       quickPoor(arr, sIndex + 1, e)
-    } else
-      quickPoor(arr, s, e)
+    } else quickPoor(arr, s, e)
   }
   arr
 }
@@ -60,14 +58,39 @@ def quick(arr: Array[Int], _s: Int, _e: Int) = {
   arr
 }
 
-(0 to 10000).map { n =>
-  val rng = 0 to n
-  val randomArr = Random.shuffle(rng).toArray
-  val org = randomArr.toList
-  quickPoor(randomArr, 0, randomArr.length - 1)
-  val ret = randomArr.toList == rng.toList
-  if (!ret) {
-    println(s"$org => ${randomArr.toList}")
-  }
-  ret
-}.forall(identity)
+
+def duration(block: => Unit): Long = {
+  val st = System.currentTimeMillis()
+  block
+  val duration = System.currentTimeMillis() - st
+  duration
+}
+
+duration {
+  (0 to 1000).map { n =>
+    val rng = 0 to n
+    val randomArr = Random.shuffle(rng).toArray
+    val org = randomArr.toList
+    quickPoor(randomArr, 0, randomArr.length - 1)
+    val ret = randomArr.toList == rng.toList
+    if (!ret) {
+      println(s"$org => ${randomArr.toList}")
+    }
+    ret
+  }.forall(identity)
+}
+
+duration {
+  (0 to 1000).map { n =>
+    val rng = 0 to n
+    val randomArr = Random.shuffle(rng).toArray
+    val org = randomArr.toList
+    quick(randomArr, 0, randomArr.length - 1)
+    val ret = randomArr.toList == rng.toList
+    if (!ret) {
+      println(s"$org => ${randomArr.toList}")
+    }
+    ret
+  }.forall(identity)
+}
+
