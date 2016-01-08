@@ -1,28 +1,31 @@
 
-def quick(xs: Array[Int]) = {
-  def swap(i: Int, j: Int) {
-    val t = xs(i)
-    xs(i) = xs(j)
-    xs(j) = t
+def quick(arr: Array[Int]) = {
+  def swap(s: Int, e: Int) {
+    val t = arr(s)
+    arr(s) = arr(e)
+    arr(e) = t
   }
-  def sort1(l: Int, r: Int) {
-    val pivot = xs((l + r) / 2)
-    var i = l
-    var j = r
-    while (i <= j) {
-      while (xs(i) < pivot) i += 1
-      while (xs(j) > pivot) j -= 1
-      if (i <= j) {
-        swap(i, j)
-        i += 1
-        j -= 1
+  def sortInner(s: Int, e: Int) {
+    val pivot = arr((s + e) / 2)
+    var sIndex = s
+    var eIndex = e
+
+    while (sIndex <= eIndex) {
+      while (arr(sIndex) < pivot) sIndex += 1
+      while (arr(eIndex) > pivot) eIndex -= 1
+
+      if (sIndex <= eIndex) {
+        swap(sIndex, eIndex)
+        sIndex += 1
+        eIndex -= 1
       }
     }
-    if (l < j) sort1(l, j)
-    if (j < r) sort1(i, r)
+
+    if (s < eIndex) sortInner(s, eIndex)
+    if (eIndex < e) sortInner(sIndex, e)
   }
-  sort1(0, xs.length - 1)
-  xs
+  sortInner(0, arr.length - 1)
+  arr
 }
 // List(5, 3, 2, 4, 6, 1, 0) == List(0, 1, 2, 3, 4, 6, 5)
 val array = Array(5, 3, 2, 4, 6, 1, 0)
