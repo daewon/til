@@ -1,5 +1,6 @@
-import io.daewon.SimpleCalc._
-import io.daewon._
+package io.daewon.parser
+
+import io.daewon.parser.SimpleCalc._
 import org.specs2.mutable.Specification
 
 class SimpleCalcSpec extends Specification {

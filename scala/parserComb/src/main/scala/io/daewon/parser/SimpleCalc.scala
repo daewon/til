@@ -1,4 +1,4 @@
-package io.daewon
+package io.daewon.parser
 
 import scala.util.parsing.combinator.syntactical.StandardTokenParsers
 

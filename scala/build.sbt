@@ -21,7 +21,10 @@ lazy val commonSettings = Seq(
 
 Revolver.settings
 
+// async
 lazy val learnToScala = project.settings(commonSettings: _*)
+
+lazy val parserComb = project.settings(commonSettings: _*)
 
 lazy val worksheet = project.settings(commonSettings: _*)
 
