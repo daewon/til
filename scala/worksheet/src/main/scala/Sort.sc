@@ -51,4 +51,5 @@ quick(arr)
     println(s"$org => ${randomArr.toList}")
   }
   ret
+
 }.forall(identity)
