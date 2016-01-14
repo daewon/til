@@ -23,15 +23,16 @@ trait Client {
   def close(): Future[Client]
 }
 
-
 sealed abstract class ClientRequest(val code: Int)
 
-class SetRequest(val key: String, val value: Array[Byte],
-                 val flags: Int = 0, val expiration: Int = 0) extends ClientRequest(Keys.Set)
+case class SetRequest(key: String,
+                      value: Array[Byte],
+                      flags: Int = 0,
+                      expiration: Int = 0) extends ClientRequest(Keys.Set)
 
-class GetRequest(val key: String) extends ClientRequest(Keys.Get)
+case class GetRequest(key: String) extends ClientRequest(Keys.Get)
 
-class DeleteRequest(val key: String) extends ClientRequest(Keys.Delete)
+case class DeleteRequest(key: String) extends ClientRequest(Keys.Delete)
 
 object ServerResponse {
   val Ok = 0x0000
