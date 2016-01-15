@@ -17,10 +17,14 @@ trait FoldM[M[_], T, U] {
   def end(s: S): M[U]
 }
 
-def count[T] = new FoldM[] {
-  type S = Int
-  def start =0 0
-  def end = s
-
+trait A {
+  def a: String
+  val b: String
 }
+
+class B extends A {
+  override val a = ""
+  override def b = ""
+}
+
 
