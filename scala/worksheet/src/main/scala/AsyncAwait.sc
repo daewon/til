@@ -4,7 +4,6 @@ import scala.concurrent._
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global //"Thread pool" to run futures
 import scala.async.Async._ //'async/await' macros blocks and implicits
-
 //Futures, Promises and goodies
 val (f1, f2, f3) = (Future(1), Future(2), Future(3))
 
@@ -21,7 +20,6 @@ seqFuture onComplete {
   case Success(nums) => println(nums)
   case Failure(ex) => println("failed")
 }
-
 async {
   val (f1, f2, f3) = (Future(1), Future(2), Future(3))
 
