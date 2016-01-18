@@ -11,8 +11,8 @@ object Try {
     }
 }
 
-sealed trait Try[+A] extends Monad[A, Try] {
-  override def unit[A](a: A): Try[A] = Try(a)
+sealed trait Try[+A] extends Monad[A, Try] with Functor[A, Try] {
+  override def unit[B](a: B): Try[B] = Try(a)
 
   def foreach[U](f: A => U): Unit
 

@@ -1,3 +1,6 @@
+package io.daewon.timeserver
+
+import io.daewon.timeclient.UnixTime
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBuf
 import io.netty.channel._
@@ -5,17 +8,20 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 
-class EchoServerHandler() extends ChannelInboundHandlerAdapter {
+class TimeEncoder extends ChannelOutboundHandlerAdapter {
+  override def write(ctx: ChannelHandlerContext, msg: AnyRef, promise: ChannelPromise): Unit = {
+    val m: UnixTime = msg.asInstanceOf[UnixTime]
+    val encoded: ByteBuf = ctx.alloc().buffer(4)
+    encoded.writeInt(m.date.asInstanceOf[Int])
+    println("2" * 70)
+    ctx.write(encoded, promise)
+  }
+}
 
+class TimeServerHandler() extends ChannelInboundHandlerAdapter {
   override def channelActive(ctx: ChannelHandlerContext): Unit = {
-    val time: ByteBuf = ctx.alloc().buffer(4)
-
-    val ts = System.currentTimeMillis() / 1000L
-    println(ts)
-
-    time.writeInt((ts + 2208988800L).asInstanceOf[Int])
-    val future: ChannelFuture = ctx.writeAndFlush(time)
-
+    println("1" * 70)
+    val future: ChannelFuture = ctx.writeAndFlush(UnixTime())
     future.addListener(ChannelFutureListener.CLOSE)
   }
 
@@ -38,8 +44,7 @@ object TimeServer extends App {
       .childHandler(new ChannelInitializer[SocketChannel]() {
         override def initChannel(ch: SocketChannel): Unit = {
           val pipe = ch.pipeline()
-          pipe.addLast(new EchoServerHandler())
-
+          pipe.addLast(new TimeEncoder, new TimeServerHandler())
         }
       })
 
