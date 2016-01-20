@@ -26,7 +26,7 @@ sealed trait Try[+A] extends Monad[A, Try] with Functor[A, Try] {
   def get: A
 }
 
-case class Success[A](a: A) extends Try[A] {
+case class Success[+A](a: A) extends Try[A] {
   override def foreach[U](f: A => U): Unit = map(f)
 
   override def isFailure: Boolean = false
@@ -42,7 +42,7 @@ case class Success[A](a: A) extends Try[A] {
   override def get: A = a
 }
 
-case class Failure[E <: Nothing](ex: Throwable) extends Try[E] {
+case class Failure[+E <: Nothing](ex: Throwable) extends Try[E] {
   override def foreach[U](f: E => U): Unit = {}
 
   override def getOrElse[B >: E](f: => B): B = f
