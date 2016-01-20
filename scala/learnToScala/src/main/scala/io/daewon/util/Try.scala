@@ -3,6 +3,7 @@ package io.daewon.util
 import scala.util.control.NonFatal
 
 object Try {
+  {scala.util.Try}
   def apply[T](f: => T): Try[T] =
     try {
       Success(f)
