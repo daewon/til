@@ -6,12 +6,13 @@ import scala.collection.JavaConversions._
 object Solution {
     def solution(A: Array[Int]): Int = {
         // write your code in Scala 2.10
-        var set = Set.empty[Int]
-        
-        A.foreach { a =>
-            if (set.contains(a)) set = set - a
-            else set = set + a
+        val set = Set.empty[Int]
+        val res = A.foldLeft(set) { case (acc, curr) =>
+            if (acc.contains(curr)) acc - curr
+            else acc + curr 
         }
-        set.head
+        
+        res.head
     }
 }
+
