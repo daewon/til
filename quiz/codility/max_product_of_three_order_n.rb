@@ -7,8 +7,8 @@ def solution(a)
 
   a.each do |n|
     if n > max[0]
-      max[1] = max[0]
       max[2] = max[1]
+      max[1] = max[0]
       max[0] = n
     elsif n > max[1]
       max[2] = max[1]
@@ -24,15 +24,9 @@ def solution(a)
       min[1] = n
     end
   end
-  puts max.inspect
-  puts min.inspect
 
-  sorted = (max + min).reject { |n| n.abs == 9999 }.sort
-  puts sorted.inspect
-
-  a = sorted[0..2].inject(:*) * sorted[-1]
-  b = (sorted[(sorted.length-3)..(sorted.length-1)] || []) .inject(:*)
+  a = min.inject(:*) * max[0]
+  b = max.inject(:*)
 
   [a, b].max
 end
-
