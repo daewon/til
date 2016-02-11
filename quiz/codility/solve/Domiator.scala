@@ -15,15 +15,11 @@ object Solution {
       else None
     }
 
-    def isMajority(arr: Array[Int], candidate: Candidate): Boolean = {
-      val count = arr.count(_ == arr(candidate.idx))
-
-      if (count > arr.size / 2) true
-      else false
-    }
+    def isMajority(arr: Array[Int], candidate: Candidate): Boolean =
+      arr.count(_ == arr(candidate.idx)) / 2
 
     def findCandidate(arr: Array[Int]): Candidate =
-      arr.indices.foldLeft(Candidate(0, 1)) { case (acc, idx) =>
+      arr.indices.foldLeft(Candidate(0, 1)) { (acc, idx) =>
         val newAcc =
           if (arr(acc.idx) == arr(idx)) acc.copy(count = acc.count + 1)
           else acc.copy(count = acc.count - 1)
