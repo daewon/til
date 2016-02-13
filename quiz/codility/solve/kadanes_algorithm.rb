@@ -1,3 +1,30 @@
+# http://stackoverflow.com/questions/15062844/maximum-sum-sublist
+cmt = <<-EOS
+There's actually a very elegant, very effcient solution using dynamic programming.
+It takes O(1) space, and O(n) time -- this can't be beat!
+
+Define A to be the input array(zero-indexed) to be the maximum sum over all sublists ending at,
+but not including position i(i.e. all sublists A[j:i]).
+
+Therefore,
+B[0] = 0
+B[1] = max(B[0] + A[0], 0)
+B[2] = max(B[1] + A[1], 0)
+B[3] = max(B[2] + A[2], 0)
+and so on.
+
+Then, clearly, the solution is given simple by max(B[0], ... , B[n])
+
+since every B value depends only on the previous B, we can avoid storing the whole B array,
+thus giving us our O(1) space guarantee.
+
+with this approach, mssl reduces to a very simple loop:
+
+EOS
+
+puts cmt
+
+
 a = [5, 7, 12, 0, -8, 6]
 b = [6, -2, -3, 4, -1, 10]
 c = [-1, -3, 4, -7, 0, 2]
