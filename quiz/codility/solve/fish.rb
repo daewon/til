@@ -2,25 +2,32 @@
 # puts "this is a debug message"
 
 def solution(a, b)
-  len = a.length
-  fish = nil
-  count = 0
-
-  (0...len).each do |idx|
-    if b[idx] == 0
-      if fish.nil?
-        count += 1
-      else
-        if fish > count
-        else
-
-          count += 1
-        end
-      end
-    else
-      fish = a[idx]
-    end
+  stack = []
+  a.zip(b).each do |size, dir|
+    stack << [size, dir]
   end
 
-  count + 1
+  # puts stack.inspect
+  pops = []
+  loop do
+    if pops.empty?
+      pops << stack.pop
+    else
+      if pops.last[1] == stack.last[1]
+        pops << stack.pop
+      else
+        if pops.last[0] > stack.last[0]
+          stack.pop
+        else
+          pops.pop
+        end
+      end
+    end
+    break if stack.empty?
+  end
+
+  # puts stack.inspect
+  # puts pops.inspect
+
+  stack.size + pops.size
 end
