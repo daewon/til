@@ -7,11 +7,17 @@ def solution(a, b)
     stack << [size, dir]
   end
 
+  alive = 0
   # puts stack.inspect
   pops = []
   loop do
     if pops.empty?
-      pops << stack.pop
+      curr = stack.pop
+      if curr[1] == 1
+        alive += 1
+      else
+        pops << curr
+      end
     else
       if pops.last[1] == stack.last[1]
         pops << stack.pop
@@ -23,11 +29,12 @@ def solution(a, b)
         end
       end
     end
+
     break if stack.empty?
   end
 
   # puts stack.inspect
   # puts pops.inspect
 
-  stack.size + pops.size
+  stack.size + pops.size + alive
 end
