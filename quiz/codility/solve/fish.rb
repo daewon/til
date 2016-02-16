@@ -2,39 +2,35 @@
 # puts "this is a debug message"
 
 def solution(a, b)
-  stack = []
-  a.zip(b).each do |size, dir|
-    stack << [size, dir]
-  end
-
+  downstream = a.zip(b).map { |size, dir| [size, dir] }
   alive = 0
-  # puts stack.inspect
-  pops = []
+  upstream = []
+
   loop do
-    if pops.empty?
-      curr = stack.pop
-      if curr[1] == 1
+    if upstream.empty?
+      size, dir = downstream.pop
+      if dir == 1 # keep alive
         alive += 1
       else
-        pops << curr
+        upstream << [size, dir]
       end
     else
-      if pops.last[1] == stack.last[1]
-        pops << stack.pop
+      down_size, down_dir = downstream.last
+      up_size, up_dir = upstream.last
+
+      if up_dir == down_dir
+        upstream << downstream.pop
       else
-        if pops.last[0] > stack.last[0]
-          stack.pop
+        if up_size > down_size
+          downstream.pop
         else
-          pops.pop
+          upstream.pop
         end
       end
     end
 
-    break if stack.empty?
+    break if downstream.empty?
   end
 
-  # puts stack.inspect
-  # puts pops.inspect
-
-  stack.size + pops.size + alive
+  downstream.size + upstream.size + alive
 end
