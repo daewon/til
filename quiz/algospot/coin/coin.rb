@@ -24,7 +24,6 @@ end
 gets.to_i.times do
   n, count_of_coins = gets.split(" ").map &:to_i
   coins = gets.split(" ").map &:to_i
-  # puts coin.call(n, coins, coins.length - 1, []) % 1000000007 
+  # puts coin.call(n, coins, coins.length - 1, []) % 1000000007
   puts coin2(n, coins) % 1000000007
 end
-
