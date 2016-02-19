@@ -41,6 +41,8 @@ Q: Sometime I stumble into the semi-mysterious notation of
 def f[T](..) = new T[({type l[A]=SomeType[A, ..]})#l] {..}
 ```
 
+# http://stackoverflow.com/questions/8736164/what-are-type-lambdas-in-scala-and-what-are-their-benefits
+
 Q: In Scala blog posts, which give it a "we used that type-lambda trick' handwave
 
 While I have some intutition about this
