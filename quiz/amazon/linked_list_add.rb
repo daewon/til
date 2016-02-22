@@ -25,6 +25,7 @@ def sum(a, b)
       stack_a << current[0]
       current = current[1]
     else
+      stack_a << current[0]
       break
     end
   end
@@ -35,6 +36,7 @@ def sum(a, b)
       stack_b << current[0]
       current = current[1]
     else
+      stack_b << current[0]
       break
     end
   end
@@ -56,11 +58,13 @@ def sum(a, b)
       else
         carry = 0
       end
-      node = [val, node]
+      node = [val % 10, node]
     elsif stack_a.empty? and not stack_b.empty?
-      vb = stack_b.pop
+      vb = stack_b.pop + carry
+      node = [vb, node]
     elsif stack_b.empty? and not stack_a.empty?
-      va = stack_a.pop
+      va = stack_a.pop + carry
+      node = [va, node]
     end
 
     break if stack_a.empty? and stack_b.empty?
@@ -68,6 +72,5 @@ def sum(a, b)
 
   node
 end
-
 
 print_list(sum(a, b))
