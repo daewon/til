@@ -79,3 +79,5 @@ class EitherMonad[A] extends Monad[({type lm[a] = Either[A, ml]})#L] {
 This is an example of currying in the type system - you have curried the type of Either,
 such that when you want to create an instacne of EitherMonad, you have to specify one of the types;
 the other of course is supplied at the time you call point or bind.
+
+Q:
