@@ -1,3 +1,4 @@
 object HelloWorld {
-  def hello(args: String*) = "Hello, " + args.headOption.fold("World!")(_ + "!")
+  def hello(args: String*) =
+    "Hello, " + args.headOption.fold("World!")(_ + "!")
 }
