@@ -14,9 +14,9 @@ defmodule Year do
     is_not = fn(a) -> not is.(a) end
 
     cond do
-      is.(4) and is.(100) and is_not.(400)-> false
-      is.(4) -> true
       is.(400) -> true
+      is.(100) -> false
+      is.(4) -> true
       true -> false
     end
   end
