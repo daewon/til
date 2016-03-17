@@ -10,13 +10,9 @@ defmodule ETL do
   @spec transform(Map) :: map()
   def transform(input) do
     input
-    |> Map.to_list
-    |> Enum.reduce(%{}, fn {k, ls}, acc ->
-      ls
-      |> Enum.map(&String.downcase/1)
-      |> Enum.reduce(acc, fn word, acc ->
-        Map.merge(%{word => k}, acc)
-      end)
-    end)
+    |> Enum.to_list
+    |> Enum.map(fn {k, vs} -> Enum.map(vs, &({String.downcase(&1), k})) end)
+    |> List.flatten
+    |> Enum.into(%{})
   end
 end
