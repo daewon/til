@@ -24,6 +24,9 @@ defmodule Meetup do
   @type weekday :: :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :sunday
   @type schedule :: :first | :second | :third | :fourth | :last | :teenth
 
+  @month_days [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  @days [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
   @doc """
   Calculate a meetup date.
 
@@ -32,56 +35,33 @@ defmodule Meetup do
   """
   @spec meetup(pos_integer, pos_integer, weekday, schedule) :: :calendar.date
   def meetup(year, month, weekday, schedule) do
-    week_days = find_week_days(year, month, weekday)
-    len = length(week_days)
-    nth =
+    days = days_of_month(month)
+    day_daynum_pairs = days |> Enum.map(fn day ->
+      {day, daynum_of(year, month, day)}
+    end)
+    matchs = day_daynum_pairs |> Enum.filter(fn {_, wd} -> wd === weekday end)
+
+    {day, _} =
       case schedule do
-        :first -> 0
-        :second -> 1
-        :third -> 2
-        :fourth -> 3
-        :last -> len - 1
-        :teenth ->
-          cond do
-            13 in week_days -> 1
-            19 in week_days -> 2
-            true -> div(len, 2)
-          end
+        :first -> matchs |> Enum.at(0)
+        :second -> matchs |> Enum.at(1)
+        :third -> matchs |> Enum.at(2)
+        :fourth -> matchs |> Enum.at(3)
+        :last -> matchs |> List.last
+        :teenth -> matchs |> Enum.find(&teenth?/1)
       end
 
-    {year, month, Enum.at(week_days, nth)}
+    {year, month, day}
   end
 
-  @schedule [:first, :second, :third, :fourth, :last, :teenth]
-  @month_days [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-  @days [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
-
-  def find_week_days(year, month, week_day) do
-    days = Enum.at(@month_days, month-1)
-    start_day = start_of_month(year, month)
-    pad = Enum.find_index(@days, &(&1 == start_day)) - 1
-
-    1..days
-    |> Enum.filter(fn n ->
-      Enum.at(@days, rem((n + pad), 7)) === week_day
-    end)
+  defp days_of_month(month) do
+    for day <- 1..Enum.at(@month_days, month-1), do: day
   end
 
-  defp start_of_year(year) do
-    daynum = :calendar.day_of_the_week(year, 1, 1)
-    @days |> Enum.at(daynum-1)
+  defp daynum_of(year, month, day) do
+    idx = :calendar.day_of_the_week(year, month, day) - 1
+    @days |> Enum.at(idx)
   end
 
-  defp start_of_month(year, month) do
-    start_of_year = start_of_year(year)
-    pad = Enum.find_index(@days, &(&1 === start_of_year))
-
-    remain = @month_days
-    |> Enum.take(month-1)
-    |> Enum.sum
-    |> + pad
-    |> rem(7)
-
-    Enum.at(@days, remain)
-  end
+  defp teenth?({day, _}), do: day in 13..19
 end
