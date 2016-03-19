@@ -16,9 +16,7 @@ defmodule SpaceAge do
   """
   @spec age_on(planet, pos_integer) :: float
   def age_on(planet, seconds) do
-    planet_rate = @planet[planet]
-    rate = seconds / 1_000_000_000
-    1_000_000_000 / 31557600 * rate * (1 / planet_rate)
+    seconds / 31557600 / @planet[planet]
   end
 
   # - Earth: orbital period 365.25 Earth days, or 31557600 seconds
