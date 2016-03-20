@@ -3,10 +3,12 @@ defmodule Grains do
   Calculate two to the power of the input minus one.
   """
   @spec square(pos_integer) :: pos_integer
-  def square(0, acc), do: acc
   def square(0), do: 1
-  def square(number), do: square(number-1, 1)
-  def square(number, acc), do: square(number-1, acc * 2)
+  def square(number) do
+    Stream.cycle([2])
+    |> Enum.take(number-1)
+    |> Enum.reduce(1, fn (n, acc) -> acc * n end)
+  end
 
   @doc """
   Adds square of each number from 1 to 64.
