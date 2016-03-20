@@ -15,6 +15,10 @@ defmodule GrainsTest do
   use ExUnit.Case
 
   # @tag :pending
+  test "square 0" do
+    assert Grains.square(0) === 1
+  end
+
   test "square 1" do
     assert Grains.square(1) === 1
   end

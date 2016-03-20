@@ -4,6 +4,7 @@ defmodule Grains do
   """
   @spec square(pos_integer) :: pos_integer
   def square(0, acc), do: acc
+  def square(0), do: 1
   def square(number), do: square(number-1, 1)
   def square(number, acc), do: square(number-1, acc * 2)
 
