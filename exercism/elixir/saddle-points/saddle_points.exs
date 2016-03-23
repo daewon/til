@@ -10,6 +10,11 @@ defmodule Matrix do
     |> Enum.map(&(String.split(&1, " ", trim: true)))
     |> Enum.map(fn row -> row |> Enum.map(&(String.to_integer(&1))) end)
   end
+  def rows(str, with_max: true) do
+    rs = rows(str)
+    max_rs = rs |> Enum.map(&Enum.max/1)
+    {rs, max_rs}
+  end
 
   @doc """
   Parses a string representation of a matrix
@@ -18,6 +23,11 @@ defmodule Matrix do
   @spec columns(String.t()) :: [[integer]]
   def columns(str) do
     str |> rows |> transpose
+  end
+  def columns(str, with_min: true) do
+    cl = columns(str)
+    min_cl = cl |> Enum.map(&Enum.min/1)
+    {cl, min_cl}
   end
 
   defp transpose([[]|_]), do: []
@@ -33,16 +43,17 @@ defmodule Matrix do
   """
   @spec saddle_points(String.t()) :: [{integer, integer}]
   def saddle_points(str) do
-    {r, c} = {rows(str), columns(str)}
-    points = for x <- 0..length(r)-1, y <- 0..length(c)-1, do: {x, y}
+    {rs, maxes} = rows(str, with_max: true)
+    {cs, mins} = columns(str, with_min: true)
+    map = for {r, i} <- Enum.with_index(rs), {c, j} <- Enum.with_index(r), do: {{i, j}, c}
 
-    points |> Enum.filter(fn {x, y} ->
-      value = r |> Enum.at(x) |> Enum.at(y)
-      check_row = r |> Enum.at(x) |> Enum.max === value
-      check_column = c |> Enum.at(y) |> Enum.min === value
-
-      check_row and check_column
+    Enum.into(map, %{})
+    |> Enum.filter(fn {{r, c}, v} ->
+      is_max = Enum.at(maxes, r) === v
+      is_min = Enum.at(mins, c) === v
+      is_max and is_min
     end)
+    |> Enum.map(fn({point, _}) -> point end)
   end
 
   # It's called a "saddle point" because it is greater than or equal to
