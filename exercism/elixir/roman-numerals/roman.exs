@@ -1,37 +1,14 @@
 defmodule Roman do
-  @ls [{1000, "M"},
-       {900, "CM"},
-       {500, "D"},
-       {400, "CD"},
-       {100, "C"},
-       {90, "XC"},
-       {80, "LXXX"},
-       {70, "LXX"},
-       {60, "LX"},
-       {50, "L"},
-       {40, "XL"},
-       {10, "X"},
-       {9, "IX"},
-       {5, "V"},
-       {4, "IV"},
-       {1, "I"}]
-
-  @keys @ls |> Enum.map(fn {k, _} -> k end)
-  @map @ls |> Enum.into(%{})
+  @nums [1000, 900, 500, 400, 100, 90, 80, 70, 60, 50, 40, 10, 9, 5, 4, 1]
+  @numerals ["M", "CM", "D", "CD", "C", "XC", "LXXX", "LXX", "LX", "L", "XL", "X", "IX", "V", "IV", "I"]
+  @map Enum.zip(@nums, @numerals) |> Enum.into(%{})
 
   @doc """
   Convert the number to a roman number.
   """
   @spec numerals(pos_integer) :: String.t
-  def numerals(number) do
-    calc(@keys, number) |> Enum.join("")
-  end
-
-  defp calc([], _), do: []
-  defp calc([k|t]=ls, number) do
-    cond do
-      number - k >= 0 -> [@map[k] | calc(ls, number-k)]
-      true -> calc(t, number)
-    end
-  end
+  def numerals(n), do: numerals(@nums, n) |> Enum.join("")
+  defp numerals([], _), do: []
+  defp numerals([h|t]=ls, n) when n - h >= 0, do: [@map[h] | numerals(ls, n-h)]
+  defp numerals([_|t], n), do: numerals(t, n)
 end
