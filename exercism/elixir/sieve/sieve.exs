@@ -4,20 +4,32 @@ defmodule Sieve do
   """
   @spec primes_to(non_neg_integer) :: [non_neg_integer]
   def primes_to(limit) do
-    primes |> Enum.take(10)
+    sieve(2, limit, [], %{}) |> Enum.reverse
   end
 
-  # primes  = sieve [2..]
-  #           where
-  #           sieve
-  # (p:xs) = p : sieve [x | x <- xs, rem x p > 0]
-
-  defp primes(prime, n) do
-    Stream.concat(2..2, Stream.filter(is_prime, primes(3..5)))
+  defp sieve(_, limit, [p|ps], _) when p > limit, do: ps
+  defp sieve(n, limit, acc, sieve_m) do
+    filtered = Map.has_key?(sieve_m, n)
+    cond do
+      filtered -> sieve(n+1, limit, acc, sieve_m)
+      prime?(n) -> sieve(n+1, limit, [n|acc], mark_sieve(sieve_m, n, limit))
+      true -> sieve(n+1, limit, acc, sieve_m)
+    end
   end
 
-  defp is_prime(primes, n) do
-    {p, ps} = {Stream.take(1, primes), Stream.drop(1, primes)}
-    p*p > n || rem(n, p) !== 0 && is_prime(ps, n)
+  defp mark_sieve(sieve_m, n, limit) do
+    Stream.iterate(n, fn m -> m * 2 end)
+    |> Stream.take_while(&(&1 <= limit))
+    |> Enum.with_index
+    |> Enum.into(sieve_m)
+  end
+
+  defp prime?(2), do: true
+  defp prime?(n) do
+    nums = 2..(:math.sqrt(n) |> Kernel.round)
+    |> Stream.filter(fn m -> rem(n, m) == 0 end)
+    |> Enum.take(1)
+
+    length(nums) == 0
   end
 end
