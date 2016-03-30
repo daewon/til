@@ -1,5 +1,15 @@
 gets # ignore
-arr = gets.split(" ").map(&:to_i)
-arr = arr.zip_with_index
+sorted = gets.split(" ").map(&:to_i).sort
+lo, hi = 0, sorted.length - 1
 
-puts arr
+ret = []
+while lo < hi
+  ret << sorted[lo]
+  ret << sorted[hi]
+
+  lo += 1
+  hi -= 1
+end
+ret << sorted[hi] if lo == hi
+
+puts ret.join(" ")
