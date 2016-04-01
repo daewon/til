@@ -54,7 +54,7 @@ defmodule FrequencyTest do
     Frequency.frequency(texts, workers) |> Enum.sort() |> Enum.into(%{})
   end
 
-  @tag :pending
+  # @tag :pending
   test "no texts mean no letters" do
     assert freq([]) == %{}
   end
@@ -90,7 +90,7 @@ defmodule FrequencyTest do
     assert freq(["Testing, 1, 2, 3"])["1"] == nil
   end
 
-  @tag :pending
+  # @tag :pending
   test "all three anthems, together, 1 worker" do
     freqs = freq([@ode_an_die_freude, @wilhelmus, @star_spangled_banner], 1)
     assert freqs["a"] == 49
@@ -98,7 +98,7 @@ defmodule FrequencyTest do
     assert freqs["ü"] == 2
   end
 
-  @tag :pending
+  # @tag :pending
   test "all three anthems, together, 4 workers" do
     freqs = freq([@ode_an_die_freude, @wilhelmus, @star_spangled_banner], 4)
     assert freqs["a"] == 49
