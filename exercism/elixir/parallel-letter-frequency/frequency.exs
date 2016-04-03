@@ -12,8 +12,7 @@ defmodule Frequency do
       texts
       |> Enum.flat_map(&String.graphemes/1)
       |> Enum.map(&String.downcase/1)
-      |> Enum.filter(&( &1 != " " and &1 != ",") )
-      |> Enum.filter(fn ch -> Regex.match?(~r/\D/, ch) end)
+      |> Enum.filter(fn ch -> Regex.match?(~r/\p{L}/, ch) end)
       |> Enum.group_by(&( &1 ))
       |> Enum.map(fn {k, ls} -> {k, length(ls)} end)
       |> Enum.into(%{})
@@ -29,12 +28,14 @@ defmodule Frequency do
   """
   @spec frequency([String.t], pos_integer) :: map
   def frequency(texts, workers) do
-    chunk_by_worker(texts, workers)
+    texts
+    |> chunk(workers)
     |> map
+    |> await
     |> reduce
   end
 
-  def chunk_by_worker(texts, workers) do
+  def chunk(texts, workers) do
     jobs = length(texts)
     cnt = div(jobs, workers)
 
@@ -46,20 +47,25 @@ defmodule Frequency do
   end
 
   def map(chunked_texts) do
-    Enum.map(chunked_texts, fn chunked_texts ->
+    chunked_texts
+    |> Enum.map(fn chunked ->
       pid = spawn_link(Worker, :loop, [])
-      send pid, {:calc, self, chunked_texts}
+      send pid, {:calc, self, chunked}
       pid
     end)
   end
 
-  def reduce(pids) do
+  def await(pids) do
     pids
     |> Enum.flat_map(fn pid ->
       receive do
         {:freq, ^pid, freq} -> freq
       end
     end)
+  end
+
+  def reduce(results) do
+    results
     |> Enum.reduce(%{}, fn {k, c}, m ->
       Map.merge(m, %{k => c}, fn _k, o, n -> o + n end)
     end)
