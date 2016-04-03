@@ -1,14 +1,7 @@
 defmodule Frequency do
 
   defmodule Worker do
-    def loop do
-      receive do
-        {:calc, sender, text} -> send sender, {:freq, self, calc(text)}
-        _ -> IO.puts "unknown"
-      end
-    end
-
-    def calc(texts) do
+    def do_calc(texts) do
       texts
       |> Enum.flat_map(&String.graphemes/1)
       |> Enum.map(&String.downcase/1)
@@ -48,20 +41,14 @@ defmodule Frequency do
 
   def map(chunked_texts) do
     chunked_texts
-    |> Enum.map(fn chunked ->
-      pid = spawn_link(Worker, :loop, [])
-      send pid, {:calc, self, chunked}
-      pid
+    |> Enum.map(fn texts ->
+      Task.async(Worker, :do_calc, [texts])
     end)
   end
 
   def await(pids) do
     pids
-    |> Enum.flat_map(fn pid ->
-      receive do
-        {:freq, ^pid, freq} -> freq
-      end
-    end)
+    |> Enum.flat_map(fn pid -> Task.await pid end)
   end
 
   def reduce(results) do
