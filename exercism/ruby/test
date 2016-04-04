@@ -1,0 +1,2 @@
+ruby -rminitest/pride $1/$1_test.rb
+
