@@ -1,2 +1,3 @@
-ruby -rminitest/pride $1/$1_test.rb
+arg=${1//-/_}
+ruby -rminitest/pride ${1}/${arg}_test.rb
 
