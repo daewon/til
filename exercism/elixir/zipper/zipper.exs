@@ -28,31 +28,25 @@ defmodule Zipper do
   def value(z), do: z.value
 
   def left(%Zipper{left: nil}), do: nil
-  def left(%Zipper{left: focus}=z) do
-    %Zipper{value: focus.value, left: focus.left, right: focus.right,
+  def left(%Zipper{left: left}=z) do
+    %Zipper{value: left.value, left: left.left, right: left.right,
             trail: [{:left, z.value, z.right} | z.trail]}
   end
 
   def right(%Zipper{right: nil}), do: nil
-  def right(%Zipper{right: focus}=z) do
-    %Zipper{value: focus.value, left: focus.left, right: focus.right,
+  def right(%Zipper{right: right}=z) do
+    %Zipper{value: right.value, left: right.left, right: right.right,
             trail: [{:right, z.value, z.left} | z.trail]}
   end
 
   def up(%Zipper{trail: []}), do: nil
   def up(%Zipper{trail: [{:left, val, right} | trail]} = z) do
     left = %BinTree{value: z.value, left:  z.left, right: z.right}
-    %Zipper{value: val,
-            left: left,
-            right: right,
-            trail: trail}
+    %Zipper{value: val, left: left, right: right, trail: trail}
   end
   def up(%Zipper{trail: [{:right, val, left}|trail]} = z) do
     right = %BinTree{value: z.value, left:  z.left, right: z.right}
-    %Zipper{value: val,
-            left: left,
-            right: right,
-            trail: trail}
+    %Zipper{value: val, left: left, right: right, trail: trail}
   end
 
   def set_value(z, v), do: %{z | value: v}
