@@ -41,11 +41,11 @@ defmodule Zipper do
 
   def up(%Zipper{trail: []}), do: nil
   def up(%Zipper{trail: [{:left, val, right} | trail]} = z) do
-    left = %BinTree{value: z.value, left:  z.left, right: z.right}
+    left = %BinTree{value: z.value, left: z.left, right: z.right}
     %Zipper{value: val, left: left, right: right, trail: trail}
   end
-  def up(%Zipper{trail: [{:right, val, left}|trail]} = z) do
-    right = %BinTree{value: z.value, left:  z.left, right: z.right}
+  def up(%Zipper{trail: [{:right, val, left} | trail]} = z) do
+    right = %BinTree{value: z.value, left: z.left, right: z.right}
     %Zipper{value: val, left: left, right: right, trail: trail}
   end
 
