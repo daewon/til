@@ -1,6 +1,6 @@
 class Squares
   def initialize(n)
-    @n, @rng = n, 1..n
+    @n, @rng = n, 0..n
   end
 
   def square_of_sum
@@ -13,7 +13,6 @@ class Squares
   end
 
   def difference
-    return 0 if @n == 0
     square_of_sum - sum_of_squares
   end
 end
