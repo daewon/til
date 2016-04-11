@@ -3,7 +3,6 @@ defmodule Graph do
 end
 
 defmodule Dot do
-  defp id(a), do: a
   defp extract_nodes(tree) do
     check_invalid(tree)
 
@@ -11,12 +10,13 @@ defmodule Dot do
     |> Enum.flat_map(fn
       {:graph, _meta, _} ->  []
       {atom, _meta, nil} ->  [{atom, []}]
+      {atom, _meta, [[]]} ->  [{atom, []}]
       {atom, _meta, [attr]} ->
-        if is_binary(List.first(attr)), do: raise ArgumentError
+        if !is_tuple(List.first(attr)), do: raise ArgumentError
         [{atom, attr}]
       _ -> []
     end)
-    |> Enum.sort_by(&id/1)
+    |> Enum.sort
   end
 
   defp extract_edges(tree) do
@@ -24,19 +24,19 @@ defmodule Dot do
 
     tree
     |> Enum.flat_map(fn
-      {:"--", _meta, [{from, _, _}, {to, _, nil} |[]]} -> Macro.escape([{from, to, []}])
-      {:"--", _meta, [{from, _, _}, {to, _, [attr]} |[]]} -> Macro.escape([{from, to, attr}])
-      {:"--", _meta, [a, b |[]]} -> raise ArgumentError
+      {:--, _meta, [{from, _, _}, {to, _, nil} |[]]} -> Macro.escape([{from, to, []}])
+      {:--, _meta, [{from, _, _}, {to, _, [attr]} |[]]} -> Macro.escape([{from, to, attr}])
+      {:--, _meta, [a, b |[]]} -> raise ArgumentError
       _ -> []
     end)
-    |> Enum.sort_by(&id/1)
+    |> Enum.sort
   end
 
   defp check_invalid(tree) do
     lst = tree |> Enum.map(&Tuple.to_list/1) |> List.flatten
     lst |> Enum.any?(fn
-      {:".", _, _} -> raise ArgumentError
-      {{:".", _, _}, _, _} -> raise ArgumentError
+      {:., _, _} -> raise ArgumentError
+      {{:., _, _}, _, _} -> raise ArgumentError
       _ -> false
     end)
   end
@@ -49,11 +49,10 @@ defmodule Dot do
       {:graph, _meta, [attr]} -> attr
       _ -> []
     end)
-    |> Enum.sort_by(&id/1)
+    |> Enum.sort
   end
 
   defmacro graph(ast) do
-    functions = %{:-- => true}
     tree = ast[:do]
 
     tree_in_block = cond do
