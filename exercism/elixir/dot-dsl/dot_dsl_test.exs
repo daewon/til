@@ -3,7 +3,7 @@ if !System.get_env("EXERCISM_TEST_EXAMPLES") do
 end
 
 ExUnit.start
-ExUnit.configure exclude: :pending, trace: true
+# ExUnit.configure exclude: :pending, trace: true
 
 defmodule DotTest do
   use ExUnit.Case
@@ -20,52 +20,52 @@ defmodule DotTest do
     end
   end
 
-  # # @tag :pending
-  # test "empty graph" do
-  #   assert %Graph{} == exprt(Dot.graph do end)
-  # end
+  # @tag :pending
+  test "empty graph" do
+    assert %Graph{} == exprt(Dot.graph do end)
+  end
 
-  # # @tag :pending
-  # test "graph with one node" do
-  #   assert %Graph{nodes: [{:a, []}]} == exprt(Dot.graph do a end)
-  # end
+  # @tag :pending
+  test "graph with one node" do
+    assert %Graph{nodes: [{:a, []}]} == exprt(Dot.graph do a end)
+  end
 
-  # # @tag :pending
-  # test "graph with one node with keywords" do
-  #   assert %Graph{nodes: [{:a, [color: :green]}]} == exprt(Dot.graph do a [color: :green] end)
-  # end
+  # @tag :pending
+  test "graph with one node with keywords" do
+    assert %Graph{nodes: [{:a, [color: :green]}]} == exprt(Dot.graph do a [color: :green] end)
+  end
 
-  # # @tag :pending
-  # test "graph with one edge" do
-  #   assert %Graph{edges: [{:a, :b, []}]} == exprt(Dot.graph do a -- b end)
-  # end
+  # @tag :pending
+  test "graph with one edge" do
+    assert %Graph{edges: [{:a, :b, []}]} == exprt(Dot.graph do a -- b end)
+  end
 
-  # # @tag :pending
-  # test "graph with just attribute" do
-  #   assert %Graph{attrs: [foo: 1]} == exprt(Dot.graph do graph [foo: 1] end)
-  # end
+  # @tag :pending
+  test "graph with just attribute" do
+    assert %Graph{attrs: [foo: 1]} == exprt(Dot.graph do graph [foo: 1] end)
+  end
 
-  # # @tag :pending
-  # test "graph with attributes" do
-  #   assert %Graph{
-  #     attrs: [bar: true, foo: 1, title: "Testing Attrs"],
-  #     nodes: [{:a, [color: :green]},
-  #             {:b, [label: "Beta!"]},
-  #             {:c, []}],
-  #     edges: [{:a, :b, [color: :blue]},
-  #             {:b, :c, []}]
-  #   } == exprt(Dot.graph do
-  #     graph [foo: 1]
-  #     graph [title: "Testing Attrs"]
-  #     graph []
-  #     a [color: :green]
-  #     c []
-  #     b [label: "Beta!"]
-  #     b -- c []
-  #     a -- b [color: :blue]
-  #     graph [bar: true]
-  #   end)
-  # end
+  # @tag :pending
+  test "graph with attributes" do
+    assert %Graph{
+      attrs: [bar: true, foo: 1, title: "Testing Attrs"],
+      nodes: [{:a, [color: :green]},
+              {:b, [label: "Beta!"]},
+              {:c, []}],
+      edges: [{:a, :b, [color: :blue]},
+              {:b, :c, []}]
+    } == exprt(Dot.graph do
+      graph [foo: 1]
+      graph [title: "Testing Attrs"]
+      graph []
+      a [color: :green]
+      c []
+      b [label: "Beta!"]
+      b -- c []
+      a -- b [color: :blue]
+      graph [bar: true]
+    end)
+  end
 
   # @tag :pending
   test "keywords stuck to graph without space" do
@@ -140,7 +140,7 @@ defmodule DotTest do
     end
   end
 
-  @tag :pending
+  # @tag :pending
   test "non-keyword attribute list" do
     assert_raise ArgumentError, fn ->
       exprt(Dot.graph do
@@ -149,7 +149,7 @@ defmodule DotTest do
     end
   end
 
-  @tag :pending
+  # @tag :pending
   test "int edge" do
     assert_raise ArgumentError, fn ->
       exprt(Dot.graph do

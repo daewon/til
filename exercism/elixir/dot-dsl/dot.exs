@@ -5,11 +5,15 @@ end
 defmodule Dot do
   defp id(a), do: a
   defp extract_nodes(tree) do
+    check_invalid(tree)
+
     tree
     |> Enum.flat_map(fn
       {:graph, _meta, _} ->  []
       {atom, _meta, nil} ->  [{atom, []}]
-      {atom, _meta, [attr]} -> [{atom, attr}]
+      {atom, _meta, [attr]} ->
+        if is_binary(List.first(attr)), do: raise ArgumentError
+        [{atom, attr}]
       _ -> []
     end)
     |> Enum.sort_by(&id/1)
@@ -22,6 +26,7 @@ defmodule Dot do
     |> Enum.flat_map(fn
       {:"--", _meta, [{from, _, _}, {to, _, nil} |[]]} -> Macro.escape([{from, to, []}])
       {:"--", _meta, [{from, _, _}, {to, _, [attr]} |[]]} -> Macro.escape([{from, to, attr}])
+      {:"--", _meta, [a, b |[]]} -> raise ArgumentError
       _ -> []
     end)
     |> Enum.sort_by(&id/1)
@@ -50,9 +55,6 @@ defmodule Dot do
   defmacro graph(ast) do
     functions = %{:-- => true}
     tree = ast[:do]
-    IO.puts("\ntree==================")
-    IO.inspect(tree)
-    IO.puts("tree==================")
 
     tree_in_block = cond do
       tree == nil -> []
