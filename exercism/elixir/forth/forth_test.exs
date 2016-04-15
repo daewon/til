@@ -8,40 +8,40 @@ ExUnit.configure exclude: :pending, trace: true
 defmodule ForthTest do
   use ExUnit.Case
 
-  # @tag :pending
-  # test "no input, no stack" do
-  #   s = Forth.new |> Forth.format_stack
-  #   assert s == ""
-  # end
+  # # @tag :pending
+  # # test "no input, no stack" do
+  # #   s = Forth.new |> Forth.format_stack
+  # #   assert s == ""
+  # # end
+
+  # # @tag :pending
+  # # test "numbers just get pushed onto the stack" do
+  # #   s = Forth.new
+  # #       |> Forth.eval("1 2 3 4 5")
+  # #       |> Forth.format_stack
+  # #   assert s == "1 2 3 4 5"
+  # # end
+
+  # # @tag :pending
+  # # test "non-word characters are separators" do
+  # #   # Note the Ogham Space Mark ( ), this is a spacing character.
+  # #   s = Forth.new
+  # #       |> Forth.eval("1\x{000}2\x{001}3\n4\r5 6\t7")
+  # #       |> Forth.format_stack
+  # #   assert s == "1 2 3 4 5 6 7"
+  # # end
 
   # @tag :pending
-  # test "numbers just get pushed onto the stack" do
+  # test "basic arithmetic" do
   #   s = Forth.new
-  #       |> Forth.eval("1 2 3 4 5")
+  #       |> Forth.eval("1 2 + 4 -")
   #       |> Forth.format_stack
-  #   assert s == "1 2 3 4 5"
-  # end
-
-  # @tag :pending
-  # test "non-word characters are separators" do
-  #   # Note the Ogham Space Mark ( ), this is a spacing character.
+  #   assert s == "-1"
   #   s = Forth.new
-  #       |> Forth.eval("1\x{000}2\x{001}3\n4\r5 6\t7")
+  #       |> Forth.eval("2 4 * 3 /") # integer division
   #       |> Forth.format_stack
-  #   assert s == "1 2 3 4 5 6 7"
+  #   assert s == "2"
   # end
-
-  # @tag :pending
-  test "basic arithmetic" do
-    s = Forth.new
-        |> Forth.eval("1 2 + 4 -")
-        |> Forth.format_stack
-    assert s == "-1"
-    # s = Forth.new
-    #     |> Forth.eval("2 4 * 3 /") # integer division
-    #     |> Forth.format_stack
-    # assert s == "2"
-  end
 
   # @tag :pending
   # test "division by zero" do
@@ -50,7 +50,7 @@ defmodule ForthTest do
   #   end
   # end
 
-  # @tag :pending
+  # # @tag :pending
   # test "dup" do
   #   s = Forth.new
   #       |> Forth.eval("1 DUP")
@@ -60,12 +60,12 @@ defmodule ForthTest do
   #       |> Forth.eval("1 2 Dup")
   #       |> Forth.format_stack
   #   assert s == "1 2 2"
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("dup")
-  #   end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("dup")
+  #   # end
   # end
 
-  # @tag :pending
+  # # @tag :pending
   # test "drop" do
   #   s = Forth.new
   #       |> Forth.eval("1 drop")
@@ -75,12 +75,12 @@ defmodule ForthTest do
   #       |> Forth.eval("1 2 drop")
   #       |> Forth.format_stack
   #   assert s == "1"
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("drop")
-  #   end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("drop")
+  #   # end
   # end
 
-  # @tag :pending
+  # # @tag :pending
   # test "swap" do
   #   s = Forth.new
   #       |> Forth.eval("1 2 swap")
@@ -90,15 +90,15 @@ defmodule ForthTest do
   #       |> Forth.eval("1 2 3 swap")
   #       |> Forth.format_stack
   #   assert s == "1 3 2"
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("1 swap")
-  #   end
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("swap")
-  #   end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("1 swap")
+  #   # end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("swap")
+  #   # end
   # end
 
-  # @tag :pending
+  # # @tag :pending
   # test "over" do
   #   s = Forth.new
   #       |> Forth.eval("1 2 over")
@@ -108,22 +108,22 @@ defmodule ForthTest do
   #       |> Forth.eval("1 2 3 over")
   #       |> Forth.format_stack
   #   assert s == "1 2 3 2"
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("1 over")
-  #   end
-  #   assert_raise Forth.StackUnderflow, fn ->
-  #     Forth.new |> Forth.eval("over")
-  #   end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("1 over")
+  #   # end
+  #   # assert_raise Forth.StackUnderflow, fn ->
+  #   #   Forth.new |> Forth.eval("over")
+  #   # end
   # end
 
   # @tag :pending
-  # test "defining a new word" do
-  #   s = Forth.new
-  #       |> Forth.eval(": dup-twice dup dup ;")
-  #       |> Forth.eval("1 dup-twice")
-  #       |> Forth.format_stack
-  #   assert s == "1 1 1"
-  # end
+  test "defining a new word" do
+    s = Forth.new
+        |> Forth.eval(": dup-twice dup dup ;")
+        |> Forth.eval("1 dup-twice")
+        |> Forth.format_stack
+    assert s == "1 1 1"
+  end
 
   # @tag :pending
   # test "redefining an existing word" do

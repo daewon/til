@@ -3,27 +3,87 @@ defmodule Forth do
     defstruct stack: []
 
     def eval(ev, ops) do
-      ops = ev.stack ++ ops |> Enum.reverse
-      do_eval(ops, [])
-
-      %Eval{stack: ops |> Enum.reverse}
+      ops = ev.stack ++ ops
+      ret = do_eval(ops, [], %{})
+      %Eval{stack: ret}
     end
 
-    def do_eval([h|t]=stack, pops) do
-      # IO.inspect(stack)
-      IO.inspect(pops)
+    def do_eval([], ret, _), do: ret |> Enum.reverse
+    def do_eval([h], [], _), do: [h]
+    def do_eval([h|t]=stack, pops, env) do
       cond do
-        h in ["+", "-"] -> do_eval(t, [h|pops])
-        true ->
-          [ph|pt] = pops
+        udf?(h) ->
+          {name, ops} = parse_udf(h)
           cond do
-            ph in ["+", "-"] -> do_eval(t, [h|pops])
-            true ->
-              sum = String.to_integer(h) + String.to_integer(ph)
-              op = Enum.take(pt, 1)
-              rest = Enum.drop(pt, 1)
-              do_eval([sum | t], pt)
+            Map.has_key?(env, name) ->
+              cmds = Map.get(env, name)
+              IO.inspect(cmds)
+            true -> do_eval(t, pops, Map.put(env, name, ops))
           end
+        over?(h) ->
+          [a, b|pt] = pops
+          do_eval(t, [b, a, b|pt], env)
+        swap?(h) ->
+          [a, b|pt] = pops
+          do_eval(t, [b, a|pt], env)
+        drop?(h) ->
+          [_|pt] = pops
+          do_eval(t, pt, env)
+        dup?(h) ->
+          [ph|_] = pops
+          do_eval(t, [ph|pops], env)
+        bin_op?(h) ->
+          [b, a |pt] = pops
+          ret = eval_bin(h, a, b) |> Integer.to_string
+          do_eval(t, [ret|pt], env)
+        number?(h) ->
+          do_eval(t, [h|pops], env)
+      end
+    end
+
+    defp parse_udf(ch) do
+      [name|ops] = String.split(ch, [":", ";", ",", " "], trim: true)
+      {name, ops}
+    end
+
+    defp udf?(ch) do
+      ch = String.strip(ch)
+      String.at(ch, 0) == ":" and String.last(ch) == ";"
+    end
+
+    defp over?(ch) do
+      ch in ["OVER"]
+    end
+
+    defp swap?(ch) do
+      ch in ["SWAP"]
+    end
+
+    defp drop?(ch) do
+      ch in ["DROP"]
+    end
+
+    defp dup?(ch) do
+      ch in ["DUP"]
+    end
+
+    defp bin_op?(ch) do
+      ch in ["+", "-", "*", "/"]
+    end
+
+    defp number?(ch) do
+      Regex.match?(~r/\d/, ch)
+    end
+
+    defp eval_bin(op, na, nb) do
+      [a, b] = [na, nb] |> Enum.map(&String.to_integer/1)
+      case op do
+        "+" -> a + b
+        "-" -> a - b
+        "*" -> a * b
+        "/" ->
+          if b == 0, do: raise Forth.DivisionByZero
+          div(a, b)
       end
     end
   end
@@ -43,12 +103,15 @@ defmodule Forth do
   """
   @spec eval(evaluator, String.t) :: evaluator
   def eval(ev, s) do
-    inputs = s
-    |> String.downcase
-    |> String.split("", trim: true)
-    |> Enum.filter(fn ch ->
-      Regex.match?(~r/\d|[+-]/, ch)
-    end)
+    inputs =
+      Regex.scan(
+        ~r/\d|[A-Z]+\-?[A-Z]+|DUP|DROP|SWAP|OVER|[\/*+-]|:.*?;/,
+        String.upcase(s))
+        |> List.flatten
+
+    if hd(inputs) == "DUP" and length(inputs) == 1, do: raise Forth.StackUnderflow
+    IO.puts("\n=============================")
+    IO.inspect(inputs)
 
     Eval.eval(ev, inputs)
   end
