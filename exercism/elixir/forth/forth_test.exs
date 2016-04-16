@@ -126,23 +126,23 @@ defmodule ForthTest do
   end
 
   # @tag :pending
-  # test "redefining an existing word" do
-  #   s = Forth.new
-  #       |> Forth.eval(": foo dup ;")
-  #       |> Forth.eval(": foo dup dup ;")
-  #       |> Forth.eval("1 foo")
-  #       |> Forth.format_stack
-  #   assert s == "1 1 1"
-  # end
+  test "redefining an existing word" do
+    s = Forth.new
+        |> Forth.eval(": foo dup ;")
+        |> Forth.eval(": foo dup dup ;")
+        |> Forth.eval("1 foo")
+        |> Forth.format_stack
+    assert s == "1 1 1"
+  end
 
   # @tag :pending
-  # test "redefining an existing built-in word" do
-  #   s = Forth.new
-  #       |> Forth.eval(": swap dup ;")
-  #       |> Forth.eval("1 swap")
-  #       |> Forth.format_stack
-  #   assert s == "1 1"
-  # end
+  test "redefining an existing built-in word" do
+    s = Forth.new
+    |> Forth.eval(": swap dup ;")
+    |> Forth.eval("1 swap")
+    |> Forth.format_stack
+    assert s == "1 1"
+  end
 
   # @tag :pending
   # test "defining words with odd characters" do

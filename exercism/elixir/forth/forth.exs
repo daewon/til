@@ -1,35 +1,30 @@
 defmodule Forth do
   defmodule Eval do
-    defstruct stack: []
+    defstruct stack: [], env: %{}
 
     def eval(ev, ops) do
       ops = ev.stack ++ ops
-      ret = do_eval(ops, [], %{})
-      %Eval{stack: ret}
+      {ret, new_env} = do_eval(ops, [], ev.env)
+      %Eval{stack: ret, env: new_env}
     end
 
-    def do_eval([], ret, _), do: ret |> Enum.reverse
-    def do_eval([h], [], _), do: [h]
+    def do_eval([], ret, env), do: {ret |> Enum.reverse, env}
+    def do_eval([h], [], env), do: {[h], env}
     def do_eval([h|t]=stack, pops, env) do
       cond do
         udf?(h) ->
           {name, ops} = parse_udf(h)
-          cond do
-            Map.has_key?(env, name) ->
-              cmds = Map.get(env, name)
-              IO.inspect(cmds)
-            true -> do_eval(t, pops, Map.put(env, name, ops))
-          end
-        over?(h) ->
+          do_eval(t, pops, Map.put(env, name, ops))
+        over?(h, env) ->
           [a, b|pt] = pops
           do_eval(t, [b, a, b|pt], env)
-        swap?(h) ->
+        swap?(h, env) ->
           [a, b|pt] = pops
           do_eval(t, [b, a|pt], env)
-        drop?(h) ->
+        drop?(h, env) ->
           [_|pt] = pops
           do_eval(t, pt, env)
-        dup?(h) ->
+        dup?(h, env) ->
           [ph|_] = pops
           do_eval(t, [ph|pops], env)
         bin_op?(h) ->
@@ -38,6 +33,12 @@ defmodule Forth do
           do_eval(t, [ret|pt], env)
         number?(h) ->
           do_eval(t, [h|pops], env)
+        true ->
+          {name, ops} = parse_udf(h)
+          if Map.has_key?(env, name) do
+            cmds = Map.get(env, name)
+            do_eval(t ++ cmds, pops, env)
+          end
       end
     end
 
@@ -51,20 +52,20 @@ defmodule Forth do
       String.at(ch, 0) == ":" and String.last(ch) == ";"
     end
 
-    defp over?(ch) do
-      ch in ["OVER"]
+    defp over?(ch, env) do
+      ch in ["OVER"] and !Map.has_key?(env, ch)
     end
 
-    defp swap?(ch) do
-      ch in ["SWAP"]
+    defp swap?(ch, env) do
+      ch in ["SWAP"] and !Map.has_key?(env, ch)
     end
 
-    defp drop?(ch) do
-      ch in ["DROP"]
+    defp drop?(ch, env) do
+      ch in ["DROP"] and !Map.has_key?(env, ch)
     end
 
-    defp dup?(ch) do
-      ch in ["DUP"]
+    defp dup?(ch, env) do
+      ch in ["DUP"] and !Map.has_key?(env, ch)
     end
 
     defp bin_op?(ch) do
@@ -109,9 +110,8 @@ defmodule Forth do
         String.upcase(s))
         |> List.flatten
 
-    if hd(inputs) == "DUP" and length(inputs) == 1, do: raise Forth.StackUnderflow
-    IO.puts("\n=============================")
-    IO.inspect(inputs)
+    # IO.puts("\n=============================")
+    # IO.inspect(inputs)
 
     Eval.eval(ev, inputs)
   end
