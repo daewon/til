@@ -141,7 +141,7 @@ defmodule Forth do
   end
 
   defmodule DivisionByZero do
-    defexception []
-    def exception(_), do: "division by zero"
+    defexception [:message]
+    def exception(_), do:  %DivisionByZero{message: "division by zero"}
   end
 end
