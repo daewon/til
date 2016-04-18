@@ -1,2 +1,0 @@
-defmodule Chat do
-end

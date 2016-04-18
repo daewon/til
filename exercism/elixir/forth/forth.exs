@@ -13,24 +13,24 @@ defmodule Forth do
       "-" => fn [b, a | t], _ -> [a - b | t] end,
       "*" => fn [b, a | t], _ -> [a * b | t] end,
       "/" => fn [b, a | t], _ ->
-        if b == 0, do: raise F.DivisionByZero; [div(a, b) | t]
+        if b == 0, do: (raise F.DivisionByZero), else: [div(a, b) | t]
       end,
       "DUP" => fn
-        [], _ -> raise Forth.StackUnderflow
+        [], _ -> raise F.StackUnderflow
         [a | t], _ -> [a, a | t]
       end,
       "DROP" => fn
-        [], _ -> raise Forth.StackUnderflow
+        [], _ -> raise F.StackUnderflow
         [_ | t], _ -> t
       end,
       "SWAP" => fn
-        [], _ -> raise Forth.StackUnderflow
-        [_], _ -> raise Forth.StackUnderflow
+        [], _ -> raise F.StackUnderflow
+        [_], _ -> raise F.StackUnderflow
         [a, b | t], _ -> [b, a| t]
       end,
       "OVER" => fn
-        [], _ -> raise Forth.StackUnderflow
-        [_], _ -> raise Forth.StackUnderflow
+        [], _ -> raise F.StackUnderflow
+        [_], _ -> raise F.StackUnderflow
         [a, b | t], _ -> [b, a, b| t]
       end
     }
@@ -65,9 +65,7 @@ defmodule Forth do
     if number?(name), do: raise F.InvalidWord
 
     func = fn _, ev ->
-      Enum.reduce(cmds, ev, fn cmd, acc ->
-        do_eval(cmd, acc)
-      end).stack
+      eval(ev, Enum.join(cmds, " ")).stack
     end
 
     {name, func}
