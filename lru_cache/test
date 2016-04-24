@@ -1,0 +1,2 @@
+ruby -rminitest/pride lru_test.rb
+
