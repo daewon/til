@@ -41,5 +41,5 @@ defmodule Queens do
   end
 
   defp check_straight({x, y}, {cx, cy}), do: x == cx or y == cy
-  defp check_diagonal({x, y}, {cx, cy}), do: abs(x-cx) == abs(y - cy)
+  defp check_diagonal({x, y}, {cx, cy}), do: abs(x - cx) == abs(y - cy)
 end
