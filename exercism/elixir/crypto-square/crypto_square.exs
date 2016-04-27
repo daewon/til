@@ -21,13 +21,10 @@ defmodule CryptoSquare do
     |> Enum.join(" ")
   end
 
-  defp transpose([], _), do: []
-  defp transpose([[]|_], acc),  do: Enum.reverse(acc)
   defp transpose(m, acc \\ []) do
-    cols = Enum.map(m, &hd/1)
-    remains = Enum.map(m, &tl/1)
-
-    transpose(remains, [cols|acc])
+    m
+    |> List.zip
+    |> Enum.map(&Tuple.to_list/1)
   end
 
   defp to_matrix([]), do: []
