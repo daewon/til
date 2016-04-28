@@ -13,31 +13,31 @@ defmodule RailFenceCipherTest do
     assert RailFenceCipher.encode("XOXOXOXOXOXOXOXOXO", 2) == "XXXXXXXXXOOOOOOOOO"
   end
 
-  @tag :pending
+  # @tag :pending
   test "encode with ending in the middle" do
     msg = "WEAREDISCOVEREDFLEEATONCE"
     assert RailFenceCipher.encode(msg, 3) == "WECRLTEERDSOEEFEAOCAIVDEN"
   end
 
-  @tag :pending
+  # @tag :pending
   test "encode empty string" do
     assert RailFenceCipher.encode("", 4) == ""
   end
 
-  @tag :pending
+  # @tag :pending
   test "encode a more diverse text" do
     msg = "The quick brown fox jumps over the lazy dog."
     cipher = "Tioxs aghucrwo p rtlzo.eqkbnfjmoeh yd   uve "
     assert RailFenceCipher.encode(msg, 4) == cipher
   end
 
-  @tag :pending
+  # @tag :pending
   test "encode with one rail" do
     msg = "One rail, only one rail"
     assert RailFenceCipher.encode(msg, 1) == msg
   end
 
-  @tag :pending
+  # @tag :pending
   test "encode letters of less than rails" do
     msg = "More rails than letters"
     assert RailFenceCipher.encode(msg, 24) == msg

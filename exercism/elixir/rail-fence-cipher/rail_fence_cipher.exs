@@ -35,30 +35,40 @@ defmodule RailFenceCipher do
   Encode a given plaintext to the corresponding rail fence ciphertext
   """
   @spec encode(String.t, pos_integer) :: String.t
+  def encode(str, 1), do: str
   def encode(str, rails) do
     chars = str |> String.split("", trim: true)
     m = List.duplicate([], rails)
 
-    a = do_encode(chars, 0, rails-1, m)
+    a = do_encode(chars, 0, rails-1, m, :up)
 
     IO.puts "\n================"
     IO.inspect m
     IO.inspect a
-    ""
+
+    Enum.map_join(a, "", fn ls ->
+      Enum.join(ls |> Enum.reverse, "")
+    end)
   end
 
-  defp do_encode([], n, limit, acc), do: acc
-  defp do_encode([h|t], n, limit, acc) when n < limit do
-    IO.inspect acc
-    r = Enum.at(acc, n)
-    IO.inspect is_list(r)
-    m = List.replace_at(acc, n, [h|r])
-    do_encode(t, n+1, limit, [h|acc])
-  end
-  defp do_encode([h|t], n, limit, acc) when n >= limit do
+  defp do_encode([], n, limit, acc, _), do: acc
+  defp do_encode([h|t], n, limit, acc, dir) do
     r = Enum.at(acc, n)
     m = List.replace_at(acc, n, [h|r])
-    do_encode(t, n-1, limit, m)
+
+    if dir == :up do
+      if n == limit do
+        do_encode(t, n-1, limit, m, :down)
+      else
+        do_encode(t, n+1, limit, m, :up)
+      end
+    else
+      if n == 0 do
+        do_encode(t, n+1, limit, m, :up)
+      else
+        do_encode(t, n-1, limit, m, :down)
+      end
+    end
   end
 
   @doc """
