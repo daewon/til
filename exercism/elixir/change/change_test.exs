@@ -18,25 +18,25 @@ defmodule ChangeTest do
     assert Change.generate(5, [1, 10]) == {:ok, change}
   end
 
-  @tag :pending
+  # @tag :pending
   test "generates the correct change when multiple coin types are needed" do
     change = %{1 => 3, 5 => 1, 10 => 1}
     assert Change.generate(18, [1, 5, 10]) == {:ok, change}
   end
 
-  @tag :pending
+  # @tag :pending
   test "returns :error when it is not possible to generate change" do
     assert Change.generate(3, [5, 10, 25]) == :error
   end
 
-  @tag :pending
+  # @tag :pending
   test "generates the same change given any coin order" do
     change = %{1 => 3, 5 => 1, 10 => 1}
     assert Change.generate(18, [1, 5, 10]) == {:ok, change}
     assert Change.generate(18, [10, 5, 1]) == {:ok, change}
   end
 
-  @tag :pending
+  # @tag :pending
   test "generates the correct change for large values with many coins" do
     change = %{1 => 3, 5 => 1, 10 => 0, 25 => 1, 100 => 1}
     assert Change.generate(133, [1, 5, 10, 25, 100]) == {:ok, change}
