@@ -41,4 +41,10 @@ defmodule ChangeTest do
     change = %{1 => 3, 5 => 1, 10 => 0, 25 => 1, 100 => 1}
     assert Change.generate(133, [1, 5, 10, 25, 100]) == {:ok, change}
   end
+
+  # @tag :pending
+  test "generates the correct change for large values with many coins 2" do
+    change = %{1 => 0, 7 => 2, 10 => 0}
+    assert Change.generate(14, [7, 10, 1]) == {:ok, change}
+  end
 end
