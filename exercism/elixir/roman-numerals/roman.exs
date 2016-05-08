@@ -1,6 +1,6 @@
 defmodule Roman do
-  @nums [1000, 900, 500, 400, 100, 90, 80, 70, 60, 50, 40, 10, 9, 5, 4, 1]
-  @numerals ["M", "CM", "D", "CD", "C", "XC", "LXXX", "LXX", "LX", "L", "XL", "X", "IX", "V", "IV", "I"]
+  @nums [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+  @numerals ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]
   @map Enum.zip(@nums, @numerals) |> Enum.into(%{})
 
   @doc """
