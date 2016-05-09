@@ -1,7 +1,5 @@
-class Integer
-  VERSION = 1
-
-  M = {
+module RomanNumerals
+  ROMAN_NUMERAL_MAP = {
     1000 => "M", 900 => "CM", 500 => "D", 400 => "CD",
     100  => "C", 90  => "XC", 50  => "L", 40  => "XL",
     10   => "X", 9   => "IX", 5   => "V", 4   => "IV",
@@ -11,15 +9,15 @@ class Integer
   def to_roman
     number = self
     romans = []
+    noms = ROMAN_NUMERAL_MAP.keys
 
-    noms = M.keys
     while number > 0 do
       n = noms.first
 
       if number < n
         noms = noms.drop(1)
       else
-        romans << M[n]
+        romans << ROMAN_NUMERAL_MAP[n]
         number -= n
       end
     end
@@ -28,18 +26,8 @@ class Integer
   end
 end
 
-class RomanNumerals < Integer
+class Integer
+  VERSION = 1
 
-end
-
-class String
-  # Considers string a roman numeral numeral,
-  # and converts it to the corresponding integer.
-  def to_i_roman
-    RomanNumerals.to_integer(self)
-  end
-  # Returns true iif the subject is a roman numeral.
-  def is_roman_numeral?
-    RomanNumerals.is_roman_numeral?(self)
-  end
+  include RomanNumerals
 end
