@@ -1,4 +1,5 @@
 import scala.util.Random
+import scala.collection._
 
 def quick(arr: Array[Int]): Array[Int] = {
   def swap(a: Int, b: Int) = if (a != b) {
@@ -53,3 +54,96 @@ quick(arr)
   ret
 
 }.forall(identity)
+
+
+trait Test[+A] {
+  def show[B >: A](a: B): String = a.toString
+}
+
+trait Ordered[T] {
+  def lessThan(left: T, right: T): Boolean
+}
+
+class Sort[T] {
+  val insertion = (arr: mutable.ArrayBuffer[T]) => { implicit ev: Ordered[T] =>
+    var i = 1
+    while (i < arr.size) {
+      val a = arr(i)
+      var find = false
+      var j = 0
+
+      while (j < i && !find) {
+        var b = arr(j)
+        if (ev.lessThan(a, b)) {
+          // shifting
+          var k = i
+          while (k > j) {
+            arr(k) = arr(k - 1)
+            k -= 1
+          }
+
+          // swap
+          arr(k) = a
+          find = true
+        }
+
+        j += 1
+      }
+
+      i += 1
+    }
+  }
+
+  val selection = (arr: mutable.ArrayBuffer[T]) => { implicit ev: Ordered[T] =>
+    var i = 0
+    while (i < arr.size - 1) {
+      var minIndex = i
+      var j = i + 1
+
+      while (j < arr.size) {
+        if (ev.lessThan(arr(j), arr(minIndex))) {
+          minIndex = j
+        }
+        j += 1
+      }
+
+      val tmp = arr(minIndex)
+      arr(minIndex) = arr(i)
+      arr(i) = tmp
+
+      i += 1
+    }
+  }
+
+  def bubble[T: Ordered](arr: mutable.ArrayBuffer[T]) = {
+    var i = 0
+    var loop = true
+
+    while (loop) {
+      var j = i + 1
+      var isChanged = false
+      while (j < arr.size) {
+        if (implicitly[Ordered[T]].lessThan(arr(j), arr(i))) {
+          val tmp = arr(i)
+          arr(i) = arr(j)
+          arr(j) = tmp
+          isChanged = true
+        }
+        j += 1
+      }
+
+      if (!isChanged) {
+        loop = false
+      }
+      i += 1
+    }
+  }
+}
+
+implicit val IntOrdered = new Ordered[Int] {
+  def lessThan(left: Int, right: Int) = left < right
+}
+
+val arr2 = mutable.ArrayBuffer(0, 1, 3, 1, 5, 0, 2, 1, 0)
+val sort = new Sort[Int].insertion(arr2)(IntOrdered)
+
