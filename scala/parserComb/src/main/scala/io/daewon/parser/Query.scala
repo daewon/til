@@ -5,8 +5,8 @@ package io.daewon.parser
   *
   * from 1, 2 in A and 3, 4, in B
   * as stepA
-  *
-  *
+  * from stepA and 4 5 in C
+  * as stepB
   */
 
 object SimpleQuery {
