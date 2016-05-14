@@ -1,0 +1,25 @@
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values) return _elm.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Console = Elm.Console.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $ElmTest = Elm.ElmTest.make(_elm),
+   $HelloWorld = Elm.HelloWorld.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var tests = A2($ElmTest.suite,
+   "Hello, World!",
+   _U.list([A2($ElmTest.test,"Hello with no name",A2($ElmTest.assertEqual,"Hello, World!",$HelloWorld.helloWorld($Maybe.Nothing)))
+           ,A2($ElmTest.test,"Hello to a sample name",A2($ElmTest.assertEqual,"Hello, Alice!",$HelloWorld.helloWorld($Maybe.Just("Alice"))))
+           ,A2($ElmTest.test,"Hello to another sample name",A2($ElmTest.assertEqual,"Hello, Bob!",$HelloWorld.helloWorld($Maybe.Just("Bob"))))]));
+   var runner = Elm.Native.Task.make(_elm).performSignal("runner",$Console.run($ElmTest.consoleRunner(tests)));
+   return _elm.Main.values = {_op: _op,tests: tests};
+};
