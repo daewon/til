@@ -5,15 +5,19 @@ defmodule Prime do
   @spec nth(non_neg_integer) :: non_neg_integer
   def nth(0), do: raise ArgumentError
   def nth(count) do
-    Stream.concat([2], Stream.iterate(3, &(&1 + 2)))
+    primes
+    |> Stream.drop(count-1)
+    |> Enum.take(1)
+    |> hd
   end
 
-  defp prime?(2), do: true
-  defp prime?(n) do
-    nums = 2..(:math.sqrt(n) |> Kernel.round)
-    |> Stream.filter(fn m -> rem(n, m) == 0 end)
-    |> Enum.take(1)
+  def primes do
+    initial = fn -> Stream.concat([2], Stream.iterate(3, fn a -> a + 2 end)) end
+    next = fn acc ->
+      prime = Enum.take(acc, 1) |> hd
+      {[prime], Stream.reject(acc, fn n -> rem(n, prime) == 0 end)}
+    end
 
-    length(nums) == 0
+    Stream.resource(initial, next, fn _ -> end)
   end
 end
