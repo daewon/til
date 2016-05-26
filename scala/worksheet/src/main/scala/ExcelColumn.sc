@@ -14,7 +14,7 @@
   * CV == 100
   */
 
-implicit class richInt(n: Int) {
+implicit class RichInt(n: Int) {
   val excelMap = (0 to 25).zip('A' to 'Z').toMap
 
   def _toExcel(_n: Int): List[Char] = {
@@ -26,7 +26,7 @@ implicit class richInt(n: Int) {
   def toExcelColumn = _toExcel(n).reverse.mkString("")
 }
 
-implicit class richString(str: String) {
+implicit class RichString(str: String) {
   val excelMap = ('A' to 'Z').zip(1 to 26).toMap
 
   def toExcelColumn: Int = {
