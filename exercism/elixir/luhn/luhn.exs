@@ -21,17 +21,6 @@ defmodule Luhn do
         num + acc
       end
     end)
-
-    # odd_sum = odd_pos |> Enum.sum
-    # even_sum = even_pos |> Enum.map(fn n ->
-    #   double = n * 2
-      #   case double > 10 do
-      #     true -> double - 9
-    #     _ -> double
-    #   end
-
-    # end) |> Enum.sum
-    # even_sum + odd_sum
   end
 
   @doc """
@@ -53,13 +42,10 @@ defmodule Luhn do
   """
   @spec create(String.t()) :: String.t()
   def create(number) do
-    last_num = number
-    |> checksum
-    |> Integer.digits
-    |> List.last
-    IO.puts("\n=========")
-    IO.inspect checksum(number)
+    ls_valid = 1..9
+    |> Enum.map(fn n -> "#{number}#{n}" end)
+    |> Enum.filter(&valid?/1)
 
-    "#{number}#{last_num}"
+    if Enum.empty?(ls_valid), do: "#{number}0", else: List.first(ls_valid)
   end
 end
