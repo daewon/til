@@ -4,20 +4,18 @@ defmodule Luhn do
   """
   @spec checksum(String.t()) :: integer
   def checksum(number) do
-    digits = number
+    reverse_with_indexed = number
     |> String.to_integer
     |> Integer.digits
     |> Enum.reverse
     |> Enum.with_index
-    |> Enum.reduce(0, fn {n, i}, acc ->
+
+    reverse_with_indexed |> Enum.reduce(0, fn {n, i}, acc ->
       if rem(i, 2) == 0 do
-        n + acc
+        n + acc # for even position
       else
         double = n * 2
-        num = case double > 10 do
-                true -> double - 9
-                _ -> double
-              end
+        num = if double > 10, do: double - 9, else: double
         num + acc
       end
     end)
@@ -28,11 +26,7 @@ defmodule Luhn do
   """
   @spec valid?(String.t()) :: boolean
   def valid?(number) do
-    last_num = number
-    |> checksum
-    |> Integer.digits
-    |> List.last
-
+    last_num = number |> checksum |> rem(10)
     last_num == 0
   end
 
