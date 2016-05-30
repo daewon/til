@@ -32,8 +32,4 @@ defmodule NthPrimeTest do
   test "weird case" do
     catch_error Prime.nth(0)
   end
-
-  test "first prime" do
-    assert Prime.nth(10_001) == 104_743
-  end
 end
