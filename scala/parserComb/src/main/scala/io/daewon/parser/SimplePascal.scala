@@ -1,8 +1,15 @@
 package io.daewon.parser
 
-/**
-  * Created by daewon on 2016. 5. 30..
-  */
-class SimplePascal {
+import scala.util.parsing.combinator.syntactical.StandardTokenParsers
 
+object SimplePascal extends StandardTokenParsers {
+  lexical.delimiters ++= Set(";")
+  def program = programHeading ~ block ~ "."
+
+  def programHeading = "program" ~ identifier ~ ";"
+
+  def identifier = rep1("rep")
+}
+
+class SimplePascal {
 }
