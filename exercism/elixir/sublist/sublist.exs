@@ -4,15 +4,22 @@ defmodule Sublist do
   and if not whether it is equal or unequal to the second list.
   """
   def compare(a, b) do
-    a_len = length(a)
-    b_len = length(b)
-
-    cond do
-      a_len === b_len && sub_list?(a, b) -> :equal
-      a_len > b_len && sub_list?(b, a) -> :superlist
-      a_len < b_len && sub_list?(a, b) -> :sublist
-      true -> :unequal
+    case compare_length(a, b) do
+      :eq -> if sub_list?(a, b), do: :equal, else: :unequal
+      :gt -> if sub_list?(b, a), do: :superlist, else: :unequal
+      :lt -> if sub_list?(a, b), do: :sublist, else: :unequal
     end
+  end
+
+  defp compare_length(a, b) do
+    find = fn
+      {[], []}, _ -> :eq
+      {_, []}, _ -> :gt
+      {[], _}, _ -> :lt
+      {[_|at], [_|bt]}, f -> f.({at, bt}, f)
+    end
+
+    find.({a, b}, find)
   end
 
   def sub_list?([], _), do: true
