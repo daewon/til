@@ -8,7 +8,7 @@ defmodule Sublist do
     b_len = length(b)
 
     cond do
-      a_len === b_len && equal_list?(a, b) -> :equal
+      a_len === b_len && sub_list?(a, b) -> :equal
       a_len > b_len && sub_list?(b, a) -> :superlist
       a_len < b_len && sub_list?(a, b) -> :sublist
       true -> :unequal
@@ -24,14 +24,6 @@ defmodule Sublist do
   defp starts_with?([ah| at], [bh| bt]) do
     case ah === bh do
       true -> starts_with?(at, bt)
-      false -> false
-    end
-  end
-
-  def equal_list?([], []), do: true
-  def equal_list?([ah | t], [bh | bt]) do
-    case ah === bh do
-      true -> equal_list?(t, bt)
       false -> false
     end
   end
