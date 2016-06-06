@@ -12,5 +12,6 @@ class Binary(_num: String) {
   lazy val toDecimal: Int = validDigits
     .reverse
     .zipWithIndex
-    .foldLeft(0) { case (acc, (n, base)) => acc + (n * Math.pow(2, base).toInt) }
+    .map { case (n, base) => n * Math.pow(2, base).toInt }
+    .sum
 }
