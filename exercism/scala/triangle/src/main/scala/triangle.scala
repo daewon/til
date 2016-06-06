@@ -8,7 +8,7 @@ object TriangleType {
 
   def matchTriangleType(a: Int, b: Int, c: Int) =
     if (a == b && b == c) Equilateral
-    else if (a + b < c) Illogical
+    else if (a + b <= c) Illogical
     else if (b == c) Isosceles
     else Scalene
 }
