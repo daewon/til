@@ -17,11 +17,12 @@ case class Allergies() {
   import Allergen._
 
   def isAllergicTo(allerge: AllergenBase, n: Int): Boolean = allerge.value <= n
+
   def allergies(n: Int): Seq[AllergenBase] = {
     def find(remain: Int, ls: Seq[AllergenBase], acc: Set[AllergenBase] = Set.empty): Seq[AllergenBase] = ls match {
       case Nil => acc.toList.sortBy(_.value)
       case hd :: tl =>
-        if (remain >= hd.value) find(remain - hd.value, ls, acc + hd)
+        if (isAllergicTo(hd, remain)) find(remain - hd.value, ls, acc + hd)
         else find(remain, tl, acc)
     }
 
