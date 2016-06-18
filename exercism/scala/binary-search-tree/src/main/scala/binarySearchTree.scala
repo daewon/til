@@ -11,18 +11,14 @@ object Bst {
     case (_, Some(r)) => Seq(e.value) ++ toList(r)
   }
 
-  implicit class RichBst[T: Ordering](bst: Bst[T]) {
-    def insert(e: T): Bst[T] = {
-      val f = implicitly[Ordering[T]]
-      val toRight = f.compare(bst.value, e) < 0
-
-      (bst.left, bst.right, toRight) match {
+  implicit class RichBst[T](bst: Bst[T]) {
+    def insert(e: T)(implicit cmp: T => Ordered[T] ): Bst[T] =
+      (bst.left, bst.right, e > bst.value) match {
         case (None, _, false) => bst.copy(left = Option(Bst(e)))
         case (Some(l), _, false) => bst.copy(left = Option(l.insert(e)))
         case (_, None, true) => bst.copy(right = Option(Bst(e)))
         case (_, Some(r), true) => bst.copy(right = Option(r.insert(e)))
       }
-    }
   }
 }
 
