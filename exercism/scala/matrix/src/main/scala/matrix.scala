@@ -4,5 +4,5 @@ case class Matrix(in: String) {
 
   def rows(n: Int): Seq[Int] = m(n)
 
-  def cols(n: Int): Seq[Int] = m.transpose.toSeq(n)
+  def cols(n: Int): Seq[Int] = m.map(_(n))
 }
