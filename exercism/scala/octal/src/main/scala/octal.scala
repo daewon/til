@@ -1,6 +1,6 @@
 object Octal {
   def intToOctal(n: Int): String = {
-    val stream = Stream.iterate(n)(n => n / 8)
+    val stream = Stream.iterate(n)(_ / 8)
     val nums = stream.takeWhile(_ > 0).map(_ % 8).reverse
 
     if (nums.forall(_ == 0)) "0"
