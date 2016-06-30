@@ -1,7 +1,6 @@
 def solution(a, k)
-  len = a.length
-  return a if k == 0 || len == 0 || k == len
+  return a if a.length < 2 || a.length == k
 
-  k = k % len if k > len
-  a[(len-1-(k-1))..-1] + a[0..(len-1-k)]
+  r = k % a.length
+  a.last(r) + a.first(a.length-r)
 end
