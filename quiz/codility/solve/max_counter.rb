@@ -3,20 +3,22 @@
 
 def solution(n, a)
   counter = [0] * n
-  max, last_max = 0, 0
+  counter_max, max = 0, 0
 
-  a.each do |k|
-    if k >= 1 and k <= n
-      counter[k-1] = last_max if counter[k-1] < last_max
-      counter[k-1] += 1
+  a.each do |c|
+    i = c-1
 
-      max = counter[k-1] if counter[k-1] > max
-    elsif k == n + 1
-      last_max = max
+    if c == n + 1
+      counter_max = max
+    else
+      # should ensure start number after max_counter applied
+      counter[i] = counter_max if counter[i] < counter_max
+      counter[i] += 1
+
+      max = [max, counter[i]].max
     end
   end
 
-  counter.each_with_index do |_, i|
-    counter[i] = last_max if counter[i] < last_max
-  end
+  # should ensure start number after max_counter applied
+  counter.map { |c| [c, counter_max].max }
 end
