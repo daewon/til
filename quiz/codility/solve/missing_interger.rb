@@ -2,22 +2,13 @@
 # puts "this is a debug message"
 
 def solution(a)
-  map = {}
-  a.each do |n|
-    if n > 0
-      map[n] = true
-    end
+  num_map = a.each_with_object({}) do |n, acc|
+    acc[n] = n
   end
-
-  i = 1
-  find = 0
-  while i < 100002 do
-    if not map[i]
-      find = i
-      break
-    end
-    i += 1
+  
+  remains = (1..100001).drop_while do |n|
+    num_map[n]
   end
-
-  find
+  
+  remains.first || 0
 end
