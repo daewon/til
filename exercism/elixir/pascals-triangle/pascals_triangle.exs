@@ -9,8 +9,7 @@ defmodule PascalsTriangle do
       next = Enum.chunk(prev, 2, 1)
       |> Enum.map(&Enum.sum/1)
 
-      [1, next, 1]
-      |> List.flatten
+      [1, next, 1] |> List.flatten
     end)
 
     pascal_stream |> Enum.take(num)
