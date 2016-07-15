@@ -60,8 +60,8 @@ class WordProblemTest extends FlatSpec with Matchers {
     WordProblem("What is 1 plus 5 minus -2?") should equal(Some(8))
   }
 
-  // Test for "Extension"
-  ignore should "handle powers" in {
-    WordProblem("What is 2 raised to the 5?") should equal(Some(32))
-  }
+  // // Test for "Extension"
+  // ignore should "handle powers" in {
+  //   WordProblem("What is 2 raised to the 5?") should equal(Some(32))
+  // }
 }
