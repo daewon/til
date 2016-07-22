@@ -1,4 +1,4 @@
-case class FoodChain() {
+object FoodChain {
   def song = List("I know an old lady who swallowed a fly."
     , "I don't know why she swallowed the fly. Perhaps she'll die."
     , ""
