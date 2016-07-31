@@ -1,3 +1,5 @@
+# https://brunch.co.kr/@sunghokimnxag/5
+
 def has_seven(n)
   while n > 0
     d = n % 10
@@ -9,30 +11,28 @@ def has_seven(n)
   false
 end
 
-def toggle_dir (dir)
-  dir == :f ? :d : :f
-end
-
-def pingpong(n)
-  def pingpong_loop(idx, limit, dir, acc)
-    if idx == limit
-      acc
-    else
-      new_dir =
-        if idx % 7 == 0 || has_seven(idx)
-          toggle_dir(dir)
-        else
-          dir
-        end
-
-      new_acc = new_dir == :f ? acc + 1 : acc - 1
-      pingpong_loop(idx + 1, limit, new_dir, new_acc)
+def iterate(init, &block)
+  prev = init
+  enum = Enumerator.new do |yielder|
+    while true
+      yielder << prev
+      prev = block.call(prev)
     end
   end
 
-  pingpong_loop(1, n, :f, 1)
+  enum
 end
 
+def pingpong(n)
+  pad = 1
+  nums = iterate([1, 1]) do |idx, acc|
+    pad *= -1 if has_seven(idx) || idx % 7 == 0
+
+    [idx + 1, acc + pad]
+  end
+
+  nums.take(n).last[1]
+end
 
 puts pingpong(8) # 6
 puts pingpong(22) # 0
