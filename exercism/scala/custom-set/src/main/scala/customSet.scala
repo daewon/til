@@ -1,7 +1,7 @@
 object CustomSet {
   type CS[A] = CustomSet[A]
 
-  def fromList[A](ls: Seq[A]): CS[A] = new CustomSet[A](ls)
+  def fromList[A](ls: Seq[A], initSize: Int = 2): CS[A] = new CustomSet[A](ls, initSize)
 
   def empty[A](set: CS[A]): Boolean = set.isEmpty
 
@@ -22,9 +22,9 @@ object CustomSet {
   def union[A](a: CS[A], b: CS[A]): CS[A] = a.union(b)
 }
 
-class CustomSet[A](ls: Seq[A]) {
+class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
   private var size = 0
-  private val MaxSize = 10000
+  private var MaxSize = initSize
   private var data: Array[List[A]] = new Array(MaxSize)
   private case object BreakEx extends RuntimeException("break")
 
@@ -132,7 +132,17 @@ class CustomSet[A](ls: Seq[A]) {
       }
     }
 
+    // rehash
+    if (MaxSize == length) {
+      val tmp: CustomSet[A] = CustomSet.fromList(List(), MaxSize * 2)
+      foreach { item =>
+        tmp.insert(item)
+      }
+
+      this.MaxSize = tmp.MaxSize
+      this.data = tmp.data
+    }
+
     this
   }
-
 }
