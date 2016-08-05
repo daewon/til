@@ -25,13 +25,13 @@ object CustomSet {
 class CustomSet[+A](ls: Seq[A], initSize: Int = 2) {
   private var size = 0
   private var MaxSize = initSize
-  private var data: Array[List[Any]] = new Array(MaxSize)
+  private var data: Array[List[_]] = new Array(MaxSize)
   private case object BreakEx extends RuntimeException("break")
 
   // initial vlaues
   ls.foreach(insert)
 
-  private def get[B >: A](item: B): (Int, List[Any]) = {
+  private def get[B >: A](item: B): (Int, List[_]) = {
     val hashKey = hash(item)
     hashKey -> data(hashKey)
   }
