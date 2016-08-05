@@ -22,30 +22,34 @@ object CustomSet {
   def union[A](a: CS[A], b: CS[A]): CS[A] = a.union(b)
 }
 
-class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
+class CustomSet[+A](ls: Seq[A], initSize: Int = 2) {
   private var size = 0
   private var MaxSize = initSize
-  private var data: Array[List[A]] = new Array(MaxSize)
+  private var data: Array[List[Any]] = new Array(MaxSize)
   private case object BreakEx extends RuntimeException("break")
 
   // initial vlaues
   ls.foreach(insert)
 
-  private def get(item: A): (Int, List[A]) = {
+  private def get[B >: A](item: B): (Int, List[Any]) = {
     val hashKey = hash(item)
     hashKey -> data(hashKey)
   }
 
-  private def hash(item: A): Int = item.hashCode.abs % MaxSize
+  private def hash[B >: A](item: B): Int = item.hashCode.abs % MaxSize
 
-  def member(item: A): Boolean = {
+  def length = size
+
+  def isEmpty = length == 0
+
+  def member[B >: A](item: B): Boolean = {
     val (hashKey, oldLs) = get(item)
 
     if (oldLs == null) false
     else oldLs.contains(item)
   }
 
-  def isSubsetOf(b: CustomSet[A]): Boolean = {
+  def isSubsetOf[B >: A](b: CustomSet[B]): Boolean = {
     var isSubset = true
 
     try {
@@ -59,7 +63,7 @@ class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
     isSubset
   }
 
-  def disjointFrom(b: CustomSet[A]): Boolean = {
+  def disjointFrom[B >: A](b: CustomSet[B]): Boolean = {
     var isDisjoint = true
 
     try {
@@ -73,7 +77,7 @@ class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
     isDisjoint
   }
 
-  def intersection(b: CustomSet[A]): CustomSet[A] = {
+  def intersection[B >: A](b: CustomSet[B]): CustomSet[A] = {
     val ret: CustomSet[A] = CustomSet.fromList(List())
 
     foreach { item =>
@@ -83,7 +87,7 @@ class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
     ret
   }
 
-  def difference(b: CustomSet[A]): CustomSet[A] = {
+  def difference[B >: A](b: CustomSet[B]): CustomSet[A] = {
     val ret: CustomSet[A] = CustomSet.fromList(List())
 
     foreach { item =>
@@ -93,7 +97,7 @@ class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
     ret
   }
 
-  def union(b: CustomSet[A]): CustomSet[A] = {
+  def union[B >: A](b: CustomSet[B]): CustomSet[A] = {
     val ret: CustomSet[A] = CustomSet.fromList(List())
 
     foreach { item =>
@@ -107,19 +111,15 @@ class CustomSet[A](ls: Seq[A], initSize: Int = 2) {
     ret
   }
 
-  def isEqual(b: CustomSet[A]): Boolean = length == b.length && isSubsetOf(b)
+  def isEqual[B >: A](b: CustomSet[B]): Boolean = length == b.length && isSubsetOf(b)
 
   def foreach(f: A => Unit) = data.foreach { items =>
     if (items != null) {
-      items.foreach { item => f(item) }
+      items.foreach { item => f(item.asInstanceOf[A]) }
     }
   }
 
-  def length = size
-
-  def isEmpty = length == 0
-
-  def insert(item: A): CustomSet[A] = {
+  def insert[B >: A](item: B): CustomSet[A] = {
     val (hashKey, oldLs) = get(item)
 
     if (oldLs == null) {

@@ -14,7 +14,7 @@ class CustomSetTest extends FunSuite with Matchers {
 
   // Contains test cases - Sets can report if they contain an element
   test("nothing is contained in an empty set") {
-    val set: CustomSet[Int] = CustomSet.fromList(List())
+    val set = CustomSet.fromList(List())
     CustomSet.member(set, 1) should be (false)
   }
 
@@ -36,14 +36,14 @@ class CustomSetTest extends FunSuite with Matchers {
   }
 
   test("empty set is a subset of non-empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
     val set2 = CustomSet.fromList(List(1))
     CustomSet.isSubsetOf(set1, set2) should be (true)
   }
 
   test("non-empty set is not a subset of empty set") {
     val set1 = CustomSet.fromList(List(1))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
     CustomSet.isSubsetOf(set1, set2) should be (false)
   }
 
@@ -73,14 +73,14 @@ class CustomSetTest extends FunSuite with Matchers {
   }
 
   test("empty set is disjoint with non-empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
     val set2 = CustomSet.fromList(List(1))
     CustomSet.isDisjointFrom(set1, set2) should be (true)
   }
 
   test("non-empty set is disjoint with empty set") {
     val set1 = CustomSet.fromList(List(1))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
     CustomSet.isDisjointFrom(set1, set2) should be (true)
   }
 
@@ -104,14 +104,14 @@ class CustomSetTest extends FunSuite with Matchers {
   }
 
   test("empty set is not equal to non-empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
     val set2 = CustomSet.fromList(List(1, 2, 3))
     CustomSet.isEqual(set1, set2) should be (false)
   }
 
   test("non-empty set is not equal to empty set") {
     val set1 = CustomSet.fromList(List(1, 2, 3))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
     CustomSet.isEqual(set1, set2) should be (false)
   }
 
@@ -129,7 +129,7 @@ class CustomSetTest extends FunSuite with Matchers {
 
   // Add test cases - Unique elements can be added to a set
   test("add to empty set") {
-    val set: CustomSet[Int] = CustomSet.fromList(List())
+    val set = CustomSet.fromList(List())
     val expected = CustomSet.fromList(List(3))
     CustomSet.isEqual(CustomSet.insert(set, 3 ), expected) should be (true)
   }
@@ -148,30 +148,30 @@ class CustomSetTest extends FunSuite with Matchers {
 
   // Intersection test cases - Intersect returns a set of all shared elements
   test("intersection of two empty sets is an empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
-    val expected: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
+    val expected = CustomSet.fromList(List())
     CustomSet.isEqual(CustomSet.intersection(set1, set2), expected) should be (true)
   }
 
   test("intersection of an empty set and non-empty set is an empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
     val set2 = CustomSet.fromList(List(3, 2, 5))
-    val expected: CustomSet[Int] = CustomSet.fromList(List())
+    val expected = CustomSet.fromList(List())
     CustomSet.isEqual(CustomSet.intersection(set1, set2), expected) should be (true)
   }
 
   test("intersection of a non-empty set and an empty set is an empty set") {
     val set1 = CustomSet.fromList(List(1, 2, 3, 4))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
-    val expected: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
+    val expected = CustomSet.fromList(List())
     CustomSet.isEqual(CustomSet.intersection(set1, set2), expected) should be (true)
   }
 
   test("intersection of two sets with no shared elements is an empty set") {
     val set1 = CustomSet.fromList(List(1, 2, 3))
     val set2 = CustomSet.fromList(List(4, 5, 6))
-    val expected: CustomSet[Int] = CustomSet.fromList(List())
+    val expected = CustomSet.fromList(List())
     CustomSet.isEqual(CustomSet.intersection(set1, set2), expected) should be (true)
   }
 
@@ -184,22 +184,22 @@ class CustomSetTest extends FunSuite with Matchers {
 
   // // Difference test cases - Difference (or Complement) of a set is a set of all elements that are only in the first set
   // test("difference of two empty sets is an empty set") {
-  //   val set1: CustomSet[Int] = CustomSet.fromList(List())
-  //   val set2: CustomSet[Int] = CustomSet.fromList(List())
-  //   val expected: CustomSet[Int] = CustomSet.fromList(List())
+  //   val set1 = CustomSet.fromList(List())
+  //   val set2 = CustomSet.fromList(List())
+  //   val expected = CustomSet.fromList(List())
   //   CustomSet.isEqual(CustomSet.difference(set1, set2), expected) should be (true)
   // }
 
   // test("difference of empty set and non-empty set is an empty set") {
-  //   val set1: CustomSet[Int] = CustomSet.fromList(List())
+  //   val set1 = CustomSet.fromList(List())
   //   val set2 = CustomSet.fromList(List(3, 2, 5))
-  //   val expected: CustomSet[Int] = CustomSet.fromList(List())
+  //   val expected = CustomSet.fromList(List())
   //   CustomSet.isEqual(CustomSet.difference(set1, set2), expected) should be (true)
   // }
 
   test("difference of a non-empty set and an empty set is the non-empty set") {
     val set1 = CustomSet.fromList(List(1, 2, 3, 4))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
     val expected = CustomSet.fromList(List(1, 2, 3, 4))
     CustomSet.isEqual(CustomSet.difference(set1, set2), expected) should be (true)
   }
@@ -213,14 +213,14 @@ class CustomSetTest extends FunSuite with Matchers {
 
   // Union test cases - Union returns a set of all elements in either set
   test("union of empty sets is an empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
-    val expected: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
+    val expected = CustomSet.fromList(List())
     CustomSet.isEqual(CustomSet.union(set1, set2), expected) should be (true)
   }
 
   test("union of an empty set and non-empty set is the non-empty set") {
-    val set1: CustomSet[Int] = CustomSet.fromList(List())
+    val set1 = CustomSet.fromList(List())
     val set2 = CustomSet.fromList(List(2))
     val expected = CustomSet.fromList(List(2))
     CustomSet.isEqual(CustomSet.union(set1, set2), expected) should be (true)
@@ -228,7 +228,7 @@ class CustomSetTest extends FunSuite with Matchers {
 
   test("union of a non-empty set and empty set is the non-empty set") {
     val set1 = CustomSet.fromList(List(1, 3))
-    val set2: CustomSet[Int] = CustomSet.fromList(List())
+    val set2 = CustomSet.fromList(List())
     val expected = CustomSet.fromList(List(1, 3))
     CustomSet.isEqual(CustomSet.union(set1, set2), expected) should be (true)
   }
