@@ -1,10 +1,10 @@
 object PythagoreanTriplet {
   type Triple = (Int, Int, Int)
 
-  def tripleToList(t: Triple) = t.productIterator.toList.asInstanceOf[Seq[Int]]
-
   def isPythagorean(triple: Triple): Boolean = {
-    val a :: b :: c :: Nil = tripleToList(triple).sorted
+    val (_a, _b, _c) = triple
+    val Seq(a, b, c) = Seq(_a, _b, _c).sorted
+
     (a * a) + (b * b) == c * c
   }
 
