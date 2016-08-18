@@ -46,7 +46,7 @@ object Ls {
   }
 }
 
-val ints = Ls.iterate[Int](1, a => a + 1)
+val ints = Ls.iterate(1, a => a + 1)
 
 ints.filter(_.toString.contains("5")).tail.tail.head
 
