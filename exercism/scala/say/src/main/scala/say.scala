@@ -37,7 +37,7 @@ object Say {
         else (r % k, ls)
       }
 
-      val prepare = vals ++ Vector(inEnglish2(rem))
+      val prepare = vals :+ inEnglish2(rem)
       Option(prepare.mkString(" ").trim)
   }
 }
