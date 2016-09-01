@@ -5,10 +5,19 @@ object ForthError extends Enumeration {
   val DivisionByZero, StackUnderflow, InvalidWord, UnknownWord = Value
 }
 
+sealed trait Expr
+case class UDF(name: String, cmd: Seq[Expr]) extends Expr
+case class Number(value: Int) extends Expr
+case class Cmd(cmd: String) extends Expr
+
 trait ForthEvaluatorState {
   // TODO: Implement. return the current stack as Text with the element
   // on top of the stack being the rightmost element in the output."
   override def toString: String
+}
+
+case class EvaluatorState(stack: List[Expr]) extends ForthEvaluatorState {
+  override def toString = stack.reverse.collect { case Number(n) => n } mkString(" ")
 }
 
 abstract class Definition {
@@ -19,32 +28,26 @@ trait ForthEvaluator  {
   def eval(text: String): Either[ForthError, ForthEvaluatorState]
 }
 
-sealed trait Expr
-case class UDF(name: String, cmd: Seq[Expr]) extends Expr
-case class Number(value: Int) extends Expr
-case class Cmd(cmd: String) extends Expr
-
-class Forth extends ForthEvaluator {
+object Forth {
   def parse(in: String): List[Expr] = {
-    val cmdLs = in.toUpperCase.split("\\r|\\n")
-
     val tokens = """(-?\d+)|([\p{L}\p{Sc}\-]+)|(\s[-+*/])""".r
-    val UdfRe = """(:.*?;)(.*)""".r
-
-    val parsed = cmdLs.flatMap {
-      case UdfRe(udf, others) => Seq(udf) ++ tokens.findAllMatchIn(others).flatMap(_.subgroups).filterNot(_ == null).toVector
-      case cmd => tokens.findAllMatchIn(cmd).flatMap(_.subgroups).filterNot(_ == null).toVector
-    }
-
+    val UdfRe = """(?s)\s*(:.+?;)(.*)""".r
     val NumberRe = """(\d+)""".r
     val CmdRe = """([\p{L}\p{Sc}\-]+)""".r
     val OpRe = """([-+*/]{1})""".r
+    val SymRe = """[\p{L}\p{Sc}\-]+""".r
 
+    def parseToken(token: String): List[String] = token match {
+      case UdfRe(udf, after) => udf :: parseToken(after)
+      case cmd => tokens.findAllMatchIn(cmd).flatMap(_.subgroups).filterNot(_ == null).toList
+    }
+
+    val parsed = parseToken(in.toUpperCase)
     parsed.map(_.trim).map {
       case UdfRe(udf, _) =>
         val Array(name, cmd@_*) = udf.trim.tail.init.split(" ").filter(_.trim.nonEmpty)
-        if (scala.util.Try(name.toInt).isSuccess) throw new IllegalArgumentException("UDF name is Number")
-        UDF(name, parse(cmd.mkString(" ")))
+        if (SymRe.unapplySeq(name).isEmpty) throw new IllegalArgumentException("UDF name is Number")
+        else UDF(name, parse(cmd.mkString(" ")))
       case NumberRe(n) => Number(n.toInt)
       case CmdRe(cmd) => Cmd(cmd)
       case OpRe(op) => Cmd(op)
@@ -52,38 +55,9 @@ class Forth extends ForthEvaluator {
     }.toList
   }
 
-  def eval(text: String): Either[ForthError, ForthEvaluatorState] = {
-    try {
-      val cmds = parse(text)
-      val ret = evalInner(cmds.toList, Nil, builtIn)
+  type ForthFn = Seq[Expr] => Seq[Number]
 
-      Right(new ForthEvaluatorState() {
-        override def toString =
-          ret.reverse.collect { case Number(n) => n } .mkString(" ")
-      })
-    } catch {
-      case _: ArithmeticException => Left(ForthError.DivisionByZero)
-      case _: NoSuchElementException => Left(ForthError.StackUnderflow)
-      case _: IllegalArgumentException => Left(ForthError.InvalidWord)
-    }
-  }
-
-  def evalInner(cmds: Seq[Expr], stack: List[Number], env: Map[Cmd, Seq[Number] => Seq[Number]]): List[Number] = cmds match {
-    case Number(n) :: tl => evalInner(tl, Number(n) :: stack, env)
-    case (u@UDF(name, udf)) :: tl =>
-
-      val f: (Seq[Number] => Seq[Number]) = (st: Seq[Number]) => {
-        evalInner(udf, st.toList, env)
-      }
-
-      evalInner(tl, stack, env + (Cmd(name) -> f))
-    case Cmd(cmd) :: tl =>
-      val f = env.getOrElse(Cmd(cmd), throw new IllegalArgumentException)
-      evalInner(tl, f(stack).toList, env)
-    case Nil => stack
-  }
-
-  val builtIn: Map[Cmd, Seq[Number] => Seq[Number]] = Map(
+  val builtIn: Map[Cmd, ForthFn] = Map(
     Cmd("+") -> ((args: Seq[Number]) => {
       val a :: b :: rest = args
       Number(a.value + b.value) :: rest
@@ -118,4 +92,32 @@ class Forth extends ForthEvaluator {
       b :: a :: b :: rest
     })
   )
+}
+
+class Forth extends ForthEvaluator {
+
+  def eval(text: String): Either[ForthError, ForthEvaluatorState] = {
+    scala.util.Try {
+      val cmds = Forth.parse(text)
+      val ret = evalInner(cmds, Nil, Forth.builtIn)
+      Right(EvaluatorState(ret))
+    } recover {
+      case _: ArithmeticException => Left(ForthError.DivisionByZero)
+      case _: NoSuchElementException => Left(ForthError.StackUnderflow)
+      case _: IllegalArgumentException => Left(ForthError.InvalidWord)
+    } get
+  }
+
+  def evalInner(cmds: Seq[Expr], stack: List[Number], env: Map[Cmd, Seq[Number] => Seq[Number]]): List[Number] = cmds match {
+    case Number(n) :: tl => evalInner(tl, Number(n) :: stack, env)
+    case (u@UDF(name, udf)) :: tl =>
+      val f = (st: Seq[Number]) => evalInner(udf, st.toList, env)
+
+      evalInner(tl, stack, env + (Cmd(name) -> f))
+    case Cmd(cmd) :: tl =>
+      val f = env.getOrElse(Cmd(cmd), throw new IllegalArgumentException)
+      evalInner(tl, f(stack).toList, env)
+
+    case Nil => stack
+  }
 }
