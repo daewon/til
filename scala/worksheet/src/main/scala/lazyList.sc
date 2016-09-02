@@ -35,10 +35,10 @@ object Ls {
     override def tail: Ls[A] = _tail
   }
 
-  def iterate[A](i: A, f: (A => A)): Ls[A] = new Ls[A] {
+  def iterate[A](i: A)(f: (A => A)): Ls[A] = new Ls[A] {
     override def head: A = i
 
-    override def tail: Ls[A] = iterate(f(i), f)
+    override def tail: Ls[A] = iterate(f(i))(f)
 
     override def filter(p: (A) => Boolean): Ls[A] =
       if (p(head)) concat(head, tail.filter(p))
@@ -46,7 +46,7 @@ object Ls {
   }
 }
 
-val ints = Ls.iterate(1, a => a + 1)
+val ints = Ls.iterate(1)(_ + 1)
 
 ints.filter(_.toString.contains("5")).tail.tail.head
 

@@ -1,6 +1,3 @@
-/**
-  * Created by daewon on 2016. 9. 2..
-  */
-object main {
-
+object Main extends App {
+  println(Stream(1).view.toList)
 }
