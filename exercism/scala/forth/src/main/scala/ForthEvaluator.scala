@@ -10,13 +10,31 @@ case class UDF(name: String, cmd: Seq[Expr]) extends Expr
 case class Number(value: Int) extends Expr
 case class Cmd(cmd: String) extends Expr
 
+trait ForthEvaluator  {
+  def eval(text: String): Either[ForthError, ForthEvaluatorState]
+}
+
+trait ForthFn extends (EvaluatorState => EvaluatorState)
+
 trait ForthEvaluatorState {
   // TODO: Implement. return the current stack as Text with the element
   // on top of the stack being the rightmost element in the output."
   override def toString: String
 }
 
-case class EvaluatorState(stack: List[Expr]) extends ForthEvaluatorState {
+case class EvaluatorState(stack: List[Number], env: Map[Cmd, ForthFn]) extends ForthEvaluatorState {
+
+  def push(exp: Number) = copy(stack = exp :: stack)
+
+  def pop(): (Number, EvaluatorState) = (stack.head, copy(stack = stack.tail))
+
+  def addEnv(name: String)(f: ForthFn): EvaluatorState = this.copy(env = env + (Cmd(name) -> f))
+
+  def apply(name: String): EvaluatorState = {
+    val f = env.getOrElse(Cmd(name), throw new IllegalArgumentException)
+    f(this)
+  }
+
   override def toString = stack.reverse.collect { case Number(n) => n } mkString(" ")
 }
 
@@ -24,9 +42,6 @@ abstract class Definition {
   def evaluate(state: Either[ForthError, ForthEvaluatorState]): Either[ForthError, ForthEvaluatorState]
 }
 
-trait ForthEvaluator  {
-  def eval(text: String): Either[ForthError, ForthEvaluatorState]
-}
 
 object Forth {
   def parse(in: String): List[Expr] = {
@@ -43,11 +58,13 @@ object Forth {
     }
 
     val parsed = parseToken(in.toUpperCase)
+
     parsed.map(_.trim).map {
       case UdfRe(udf, _) =>
         val Array(name, cmd@_*) = udf.trim.tail.init.split(" ").filter(_.trim.nonEmpty)
         if (SymRe.unapplySeq(name).isEmpty) throw new IllegalArgumentException("UDF name is Number")
         else UDF(name, parse(cmd.mkString(" ")))
+
       case NumberRe(n) => Number(n.toInt)
       case CmdRe(cmd) => Cmd(cmd)
       case OpRe(op) => Cmd(op)
@@ -55,42 +72,61 @@ object Forth {
     }.toList
   }
 
-  type ForthFn = Seq[Expr] => Seq[Number]
-
   val builtIn: Map[Cmd, ForthFn] = Map(
-    Cmd("+") -> ((args: Seq[Number]) => {
-      val a :: b :: rest = args
-      Number(a.value + b.value) :: rest
-    }),
-    Cmd("-") -> ((args: Seq[Number]) => {
-      val a :: b :: rest = args
-      Number(b.value - a.value) :: rest
-    }),
-    Cmd("*") -> ((args: Seq[Number]) => {
-      val a :: b :: rest = args
-      Number(a.value * b.value) :: rest
-    }),
-    Cmd("/") -> ((args: Seq[Number]) => {
-      val a :: b :: rest = args
-      Number(b.value / a.value) :: rest
-    }),
-    Cmd("DUP") -> ((args: Seq[Number]) => {
-      args.head +: args
-    }),
-    Cmd("DROP") -> ((args: Seq[Number]) => {
-      if (args.isEmpty) throw new NoSuchElementException
-      args.tail
-    }),
-    Cmd("SWAP") -> ((args: Seq[Number]) => {
-      if (args.lengthCompare(2) < 0) throw new NoSuchElementException
-      val a :: b :: rest = args
-      b :: a :: rest
-    }),
-    Cmd("OVER") -> ((args: Seq[Number]) => {
-      if (args.lengthCompare(2) < 0) throw new NoSuchElementException
-      val a :: b :: rest = args
-      b :: a :: b :: rest
-    })
+    Cmd("+") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(Number(a.value + b.value))
+      }
+    },
+    Cmd("-") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(Number(b.value - a.value))
+      }
+    },
+    Cmd("*") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(Number(a.value * b.value))
+      }
+    },
+    Cmd("/") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(Number(b.value / a.value))
+      }
+    },
+    Cmd("DUP") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        ev.push(a)
+      }
+    },
+    Cmd("DROP") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        ev2
+      }
+    },
+    Cmd("SWAP") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(a).push(b)
+      }
+    },
+    Cmd("OVER") -> new ForthFn {
+      def apply(ev: EvaluatorState): EvaluatorState  = {
+        val (a, ev2) = ev.pop
+        val (b, ev3) = ev2.pop
+        ev3.push(b).push(a).push(b)
+      }
+    }
   )
 }
 
@@ -99,8 +135,7 @@ class Forth extends ForthEvaluator {
   def eval(text: String): Either[ForthError, ForthEvaluatorState] = {
     scala.util.Try {
       val cmds = Forth.parse(text)
-      val ret = evalInner(cmds, Nil, Forth.builtIn)
-      Right(EvaluatorState(ret))
+      Right(evalInner(cmds, EvaluatorState(Nil, Forth.builtIn)))
     } recover {
       case _: ArithmeticException => Left(ForthError.DivisionByZero)
       case _: NoSuchElementException => Left(ForthError.StackUnderflow)
@@ -108,16 +143,14 @@ class Forth extends ForthEvaluator {
     } get
   }
 
-  def evalInner(cmds: Seq[Expr], stack: List[Number], env: Map[Cmd, Seq[Number] => Seq[Number]]): List[Number] = cmds match {
-    case Number(n) :: tl => evalInner(tl, Number(n) :: stack, env)
+  def evalInner(cmds: List[Expr], es: EvaluatorState): EvaluatorState = cmds match {
+    case Number(n) :: tl => evalInner(tl, es.push(Number(n)))
     case (u@UDF(name, udf)) :: tl =>
-      val f = (st: Seq[Number]) => evalInner(udf, st.toList, env)
-
-      evalInner(tl, stack, env + (Cmd(name) -> f))
-    case Cmd(cmd) :: tl =>
-      val f = env.getOrElse(Cmd(cmd), throw new IllegalArgumentException)
-      evalInner(tl, f(stack).toList, env)
-
-    case Nil => stack
+      val f = new ForthFn {
+        def apply(ev: EvaluatorState) = evalInner(udf.toList, ev)
+      }
+      evalInner(tl, es.addEnv(name)(f))
+    case Cmd(name) :: tl => evalInner(tl, es.apply(name))
+    case Nil => es
   }
 }
