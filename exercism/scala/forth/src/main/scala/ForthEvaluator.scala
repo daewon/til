@@ -42,7 +42,6 @@ abstract class Definition {
   def evaluate(state: Either[ForthError, ForthEvaluatorState]): Either[ForthError, ForthEvaluatorState]
 }
 
-
 object Forth {
   def parse(in: String): List[Expr] = {
     val tokens = """(-?\d+)|([\p{L}\p{Sc}\-]+)|(\s[-+*/])""".r
@@ -143,14 +142,17 @@ class Forth extends ForthEvaluator {
     } get
   }
 
-  def evalInner(cmds: List[Expr], es: EvaluatorState): EvaluatorState = cmds match {
-    case Number(n) :: tl => evalInner(tl, es.push(Number(n)))
-    case (u@UDF(name, udf)) :: tl =>
-      val f = new ForthFn {
-        def apply(ev: EvaluatorState) = evalInner(udf.toList, ev)
+  def evalInner(cmds: List[Expr], es: EvaluatorState): EvaluatorState = {
+    cmds.foldLeft(es) { case (acc, curr) =>
+      curr match {
+        case Number(n) => acc.push(Number(n))
+        case (u@UDF(name, udf)) => acc.addEnv(name) {
+          new ForthFn {
+            def apply(ev: EvaluatorState) = evalInner(udf.toList, ev)
+          }
+        }
+        case Cmd(name) => acc.apply(name)
       }
-      evalInner(tl, es.addEnv(name)(f))
-    case Cmd(name) :: tl => evalInner(tl, es.apply(name))
-    case Nil => es
+    }
   }
 }
