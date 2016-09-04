@@ -10,8 +10,7 @@ defmodule ETL do
   @spec transform(Map) :: map()
   def transform(input) do
     input
-    |> Enum.map(fn {k, vs} -> Enum.map(vs, &({String.downcase(&1), k})) end)
-    |> List.flatten
+    |> Enum.flat_map(fn {k, vs} -> Enum.map(vs, &({String.downcase(&1), k})) end)
     |> Enum.into(%{})
   end
 end
