@@ -1,7 +1,5 @@
 module Accumulate (accumulate) where
 
-accumulate :: [a] -> a -> a -> a
-accumulate f ls =
-  | a -> 10 =>
--- accumulate
--- accumulate square [1, 2, 3]
+accumulate :: (a -> b) [a] -> [b]
+accumulate _ [] = []
+accumulate f (x:xs) = f x : accumulate f xs
