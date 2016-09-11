@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="NucleotideTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2016-09-10T16:25:02" hostname="kakao.local" time="0.081">
+  <properties/>
+  <testcase name="testEmptyDnaStringHasNoAdenosine" classname="NucleotideTest" time="0.068"/>
+  <testcase name="testEmptyDnaStringHasNoNucleotides" classname="NucleotideTest" time="0.009"/>
+  <testcase name="testCountsOnlyThymidine" classname="NucleotideTest" time="0.0"/>
+  <testcase name="testRepetitiveCytidineGetsCounted" classname="NucleotideTest" time="0.0"/>
+  <testcase name="testRepetitiveSequenceWithOnlyGuanosine" classname="NucleotideTest" time="0.0"/>
+  <testcase name="testCountsANucleotideOnlyOnce" classname="NucleotideTest" time="0.001"/>
+  <testcase name="testDnaCountsDoNotChangeAfterCountingAdenosine" classname="NucleotideTest" time="0.0"/>
+  <testcase name="testValidatesNucleotides" classname="NucleotideTest" time="0.0"/>
+  <testcase name="testCountsAllNucleotides" classname="NucleotideTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
