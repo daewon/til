@@ -1,10 +1,10 @@
 
 ==================== FINAL INTERFACE ====================
-2016-09-10 10:03:23.303592 UTC
+2016-09-13 14:28:23.794539 UTC
 
 interface strain-0.0.0-F2DHcWZecUvKFGzwHrhEE7:Strain 8001
-  interface hash: aaf8c6ede3550689da862b1f261e4c92
-  ABI hash: f9ea0401b81db0ccd5850f426b881fbc
+  interface hash: bcb0101937df951c3efcb43fd4d6e822
+  ABI hash: 8b207c00acaa35da00c5cca935c91a6d
   export-list hash: ec8f8b4feb67a6efe0895c4b26cdc9fc
   orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
   flag hash: a4046e0fdab24403354cf30558c1ea1c
@@ -24,7 +24,6 @@ family instance modules: base-4.9.0.0:Control.Applicative
                          base-4.9.0.0:GHC.Generics base-4.9.0.0:GHC.IO.Exception
                          base-4.9.0.0:GHC.TypeLits
 import  -/  base-4.9.0.0:GHC.Base 8ed3be81c0707b322f975a84ae1bb816
-import  -/  base-4.9.0.0:GHC.List 13d2451194c1c6e53b4f4f07947736dd
 import  -/  base-4.9.0.0:Prelude b9bddb97799837fe67a8d00939a5b6c3
 import  -/  ghc-prim-0.5.0.0:GHC.Classes 0bdf3d057a415ec1b84a7b1994efbe47
 833f2be9e8211ab11e0b5c6608bcec53
@@ -42,31 +41,21 @@ e6cec62227eaec0eceee18fdd155ebee
   {- HasNoCafRefs, Strictness: m1,
      Unfolding: (GHC.Types.TrNameS
                    "strain-0.0.0-F2DHcWZecUvKFGzwHrhEE7"#) -}
-13496527220299dabe366ff0b58a6929
+c024c4945a8de8de954b4cd5388d871e
   discard :: (a -> GHC.Types.Bool) -> [a] -> [a]
   {- Arity: 2, HasNoCafRefs, Strictness: <L,C(U)><S,1*U>,
      Unfolding: InlineRule (2, True, False)
-                (\ @ a (f :: a -> GHC.Types.Bool) (a1 :: [a]) ->
-                 GHC.Base.build
+                (\ @ a (f :: a -> GHC.Types.Bool) (eta :: [a]) ->
+                 Strain.keep
                    @ a
-                   (\ @ b (c :: a -> b -> b)[OneShot] (n :: b)[OneShot] ->
-                    GHC.Base.foldr
-                      @ a
-                      @ b
-                      (GHC.List.filterFB
-                         @ a
-                         @ b
-                         c
-                         (\ (x :: a) ->
-                          case f x of wild {
-                            GHC.Types.False -> GHC.Types.True
-                            GHC.Types.True -> GHC.Types.False }))
-                      n
-                      a1)) -}
-498cb9076230ba032beae530dfebe2ff
+                   (\ (x :: a) ->
+                    case f x of wild {
+                      GHC.Types.False -> GHC.Types.True
+                      GHC.Types.True -> GHC.Types.False })
+                   eta) -}
+8f2bcf7c163f805d9a4a34e67435ebb7
   keep :: (a -> GHC.Types.Bool) -> [a] -> [a]
-  {- Arity: 2, HasNoCafRefs, Strictness: <L,C(U)><S,1*U>,
-     Unfolding: InlineRule (0, True, True) GHC.List.filter -}
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,C(U)><S,1*U> -}
 vectorised variables:
 vectorised tycons:
 vectorised reused tycons:
