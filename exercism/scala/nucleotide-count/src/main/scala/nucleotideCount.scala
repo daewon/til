@@ -1,5 +1,7 @@
 class DNA(dna: String) {
+
   val base = Map('A' -> 0, 'T' -> 0, 'C' -> 0, 'G' -> 0)
+
   val map = dna.foldLeft(base) { case (acc, ch) =>
     acc.get(ch) match {
       case None => throw new RuntimeException("Invalid char")
