@@ -18,7 +18,7 @@ case class Multiply(lhs: Exp, rhs: Exp) extends Exp {
   override def toString = s"(* $lhs $rhs)"
 }
 
-val ws = P(" ".rep(0))
+val ws = P(" ".rep)
 
 val one = P("one")
 val two = P("two")
@@ -30,19 +30,23 @@ val plus = P("+")
 val minus = P("-")
 val times = P("*")
 
-val factor = number
+lazy val parened = P("(" ~ ws ~ expr ~ ws ~ ")")
 
-def makeTree(a: Exp, b: Exp)(f: (Exp, Exp) => Exp): Exp = f(a, b)
+lazy val factor = P(number | parened)
 
-val timesOp: P[Exp] = P(factor ~ (ws ~ times ~ ws ~ factor).rep).map {
-  case (e, exprs) =>
-    Multiply(e, exprs.reduceLeft[Exp] { case (acc, curr) =>
-      makeTree(acc, curr)(Multiply)
-    })
+lazy val timesOp: P[Exp] = P(factor ~ (ws ~ times ~ ws ~ factor).rep).map {
+  case (e, expr) =>
+    expr.foldLeft(e: Exp) { case (acc, curr) => Multiply(acc, curr) }
 }
 
-val parser = timesOp
+lazy val plusOp: P[Exp] = P(timesOp ~ (ws ~ plus ~ ws ~ timesOp).rep).map {
+  case (e, expr) =>
+    expr.foldLeft(e) { case (acc, curr) => Plus(acc, curr) }
+}
 
-parser.parse("1 * 2 * 3")
+lazy val expr = plusOp
+
+expr.parse("1 * 2 + (3 + 4)")
+
 
 
