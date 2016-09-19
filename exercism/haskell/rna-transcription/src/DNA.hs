@@ -8,5 +8,5 @@ import qualified Data.Map as Map
 dnas = zip "CGTA" "GCAU"
 
 toRNA :: String -> Maybe String
-toRNA str = sequence $ map mapTo str
-  where mapTo = flip lookup $ dnas
+toRNA str = traverse find str
+  where find = flip lookup $ dnas
