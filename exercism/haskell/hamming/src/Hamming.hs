@@ -1,8 +1,10 @@
 module Hamming (distance) where
 
 distance :: String -> String -> Maybe Int
-distance xs ys = countM where
-  countM = diffM >>= return . length
-  diffM = case length xs == length ys of
-    True -> Just $ filter neq $ zip xs ys where neq tpl = fst tpl /= snd tpl
-    False -> Nothing
+distance [] [] = Just 0
+distance [] _ = Nothing
+distance _ [] = Nothing
+distance (x:xs) (y:ys) = if eq then rest else rest >>= return . (+1)
+  where
+    eq = x == y
+    rest = distance xs ys
