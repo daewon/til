@@ -95,3 +95,5 @@ project/boot/
 /logs/
 project/
 tl
+
+.stack-work
