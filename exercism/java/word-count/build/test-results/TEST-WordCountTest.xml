@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="WordCountTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2016-09-18T05:31:09" hostname="kakao.local" time="0.043">
+  <properties/>
+  <testcase name="countOneWord" classname="WordCountTest" time="0.041"/>
+  <testcase name="countOneOfEach" classname="WordCountTest" time="0.0"/>
+  <testcase name="countMultipleOccurences" classname="WordCountTest" time="0.001"/>
+  <testcase name="ignorePunctuation" classname="WordCountTest" time="0.0"/>
+  <testcase name="includeNumbers" classname="WordCountTest" time="0.0"/>
+  <testcase name="normalizeCase" classname="WordCountTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
