@@ -7,6 +7,6 @@ import qualified Data.Map as Map
 
 dnas = zip "CGTA" "GCAU"
 
-toRNA :: String -> Maybe String
+toRNA :: (Traversable t) => t Char -> Maybe (t Char)
 toRNA str = traverse find str
   where find = flip lookup $ dnas
