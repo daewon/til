@@ -36,6 +36,11 @@ defmodule ChangeTest do
     assert Change.generate(18, [10, 5, 1]) == {:ok, change}
   end
 
+  # test "largest" do
+  #   change = %{2 => 2, 5 => 1, 20 => 2, 50 => 1, 100 => 9}
+  #   assert Change.generate(999, [1, 2, 5, 10, 20, 50, 100]) == {:ok, change}
+  # end
+
   # @tag :pending
   test "generates the correct change for large values with many coins" do
     change = %{1 => 3, 5 => 1, 10 => 0, 25 => 1, 100 => 1}
