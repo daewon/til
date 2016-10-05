@@ -1,26 +1,39 @@
 object Change {
-  def findFewestCoins(_amount: Int, _totalCoins: List[Int]): Option[List[Int]] = {
-    def recur(remain: Int, coins: List[Int], used: List[Int]): List[Int] = {
-      if (remain == 0) used
-      else if (coins.isEmpty || remain < 0) Nil
+  type Coin = Int
+  type Coins = List[Coin]
+  type Amount = Int
+
+  def findFewestCoins(target: Amount, coins: Coins): Option[Coins] = {
+    def minChange(target: Amount, coins: Coins, candidate: Coins,
+      bestResult: Option[Coins]): Option[Coins] =
+    {
+      def isWorseResult: Boolean =
+        bestResult map (_.length <= candidate.length) getOrElse false
+
+      if (target < 0 || isWorseResult) bestResult
+      else if (target == 0) Some(candidate)
       else {
-        val coin :: remains = coins
-
-        val coinUsed = recur(remain - coin, coins, coin :: used)
-        val coinNotUsed = recur(remain, remains, used)
-
-        (coinUsed, coinNotUsed) match {
-          case (Nil, b) => b
-          case (a, Nil) => a
-          case (a, b) => if (a.length > b.length) b else a
-        }
+        val newBestResult = addCoin(target, coins, candidate, bestResult)
+        dropCoin(target, coins, candidate, newBestResult)
       }
     }
 
-    if (_amount == 0) Some(Nil)
-    else recur(_amount, _totalCoins, Nil) match {
-      case Nil => None
-      case coins => Some(coins.sorted)
-    }
+    def addCoin(target: Amount, coins: Coins, candidate: Coins,
+      bestResult: Option[Coins]): Option[Coins] =
+      coins match {
+        case coin :: _ if target - coin >= 0 =>
+          minChange(target - coin, coins, coin :: candidate, bestResult)
+        case _ => bestResult
+      }
+
+    def dropCoin(target: Amount, coins: Coins, candidate: Coins,
+      bestResult: Option[Coins]): Option[Coins] =
+      coins match {
+        case _ :: restCoins =>
+          minChange(target, restCoins, candidate, bestResult)
+        case _ => bestResult
+      }
+
+    minChange(target, coins.sorted(Ordering.Int.reverse), List(), None)
   }
 }

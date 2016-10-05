@@ -17,10 +17,10 @@ class ChangeTest extends FunSuite with Matchers {
     Change.findFewestCoins(63, List(1, 5, 10, 21, 25)) should be (Some(List(21, 21, 21)))
   }
 
-  // test("large target values") {
-  //   Change.findFewestCoins(999, List(1, 2, 5, 10, 20, 50, 100)) should
-  //     be (Some(List(2, 2, 5, 20, 20, 50, 100, 100, 100, 100, 100, 100, 100, 100, 100)))
-  // }
+  test("large target values") {
+    Change.findFewestCoins(999, List(1, 2, 5, 10, 20, 50, 100)) should
+      be (Some(List(2, 2, 5, 20, 20, 50, 100, 100, 100, 100, 100, 100, 100, 100, 100)))
+  }
 
   test("no coins make 0 change") {
     Change.findFewestCoins(0, List(1, 5, 10, 21, 25)) should be (Some(List()))
