@@ -14,6 +14,7 @@ data LinkedList a = Nil | Cons a (LinkedList a)
 
 datum :: LinkedList a -> a
 datum (Cons a _) = a
+datum Nil = undefined
 
 fromList :: [a] -> LinkedList a
 fromList (x : xs) = Cons x $ fromList xs
@@ -24,22 +25,20 @@ isNil Nil = True
 isNil _ = False
 
 new :: a -> LinkedList a -> LinkedList a
-new a ls@(Cons _ _) = Cons a ls
-new a Nil = Cons a Nil
+new a xs = Cons a xs
 
 next :: LinkedList a -> LinkedList a
-next (Cons a rest) = rest
+next (Cons _ rest) = rest
 next Nil = Nil
 
 nil :: LinkedList a
 nil = Nil
 
-rev (Cons a rest) acc = rev rest $ Cons a acc
-rev Nil acc = acc
-
 reverseLinkedList :: LinkedList a -> LinkedList a
-reverseLinkedList ls@(Cons a rest) = rev ls Nil
-reverseLinkedList Nil = Nil
+reverseLinkedList xs = revAcc xs Nil where
+  revAcc :: LinkedList a -> LinkedList a -> LinkedList a
+  revAcc (Cons a rest) acc = revAcc rest $ Cons a acc
+  revAcc Nil acc = acc
 
 toList :: LinkedList a -> [a]
 toList (Cons a rest) = a : (toList rest)
