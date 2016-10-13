@@ -63,9 +63,17 @@ class KbdManaia
     login_url = URI.parse("http://www.kbdmania.net/xe/")
     ret = Http.post(login_url, payload, headers)
 
-    # STDERR.puts "login success: #{ret.to_hash}"
+    ret = ret.to_hash['set-cookie']
+    puts ret
 
-    ret.to_hash['set-cookie'].join
+    if ret.empty?
+      puts "login failed: #{ret.inspect}"
+      exit(1)
+    else 
+      puts "login success: #{ret.inspect}"
+    end
+
+    ret.join
   end
 
   def getPage(cookie)
@@ -84,7 +92,7 @@ class KbdManaia
   end
 end
 
-kbd = KbdManaia.new $1
+kbd = KbdManaia.new ARGV.first
 cookie = kbd.getAuthToken
 
 seen = {}
@@ -96,6 +104,7 @@ loop do
   target = html_doc.css('.boardList .title')
   target = target.reject { |title| title.css('.category').text == '거래완료' }
   target = target.map { |title| title.css('a').text }
+
   selected = target.select do |title|
     seen[title.downcase.hash] ? false : /해피|hhkp|포커|poker|hacker|abko/ =~ title.downcase
   end
