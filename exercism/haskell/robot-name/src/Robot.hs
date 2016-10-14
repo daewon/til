@@ -1,20 +1,20 @@
-module Robot (Robot, mkRobot, resetName, robotName) where
+module Robot (robotName, mkRobot, resetName) where
+
 import System.Random
+import Control.Concurrent (MVar, readMVar, swapMVar, newMVar)
+import Control.Monad
 
-data Robot = Robot { name :: String } deriving Show
+data Robot = Robot (MVar String)
 
-randomList :: (Random a) => Int -> [a]
-randomList seed = randoms (mkStdGen seed)
+newName :: IO String
+newName = sequence $ fmap randomRIO [chr, chr, ord, ord, ord]
+  where (chr, ord) = (('A', 'Z'), ('0', '9'))
 
 mkRobot :: IO Robot
-mkRobot = do
-  gen <- newStdGen
-  let ns = randoms gen :: [Int]
-  return Robot { name = show ns }
-
-resetName :: Robot -> IO ()
-resetName = undefined
-
+mkRobot = newName >>= newMVar >>= return . Robot
 
 robotName :: Robot -> IO String
-robotName = undefined
+robotName (Robot r) = readMVar r >>= return
+
+resetName :: Robot -> IO ()
+resetName (Robot r) = void (newName >>= swapMVar r)

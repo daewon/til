@@ -35,38 +35,38 @@ specs = describe "robot-name" $ do
           it "name should match expected pattern" $
             mkRobot >>= robotName >>= (`shouldSatisfy` matchesPattern)
 
-          -- it "name is persistent" $
-          --   mkRobot >>= testPersistence
+          it "name is persistent" $
+            mkRobot >>= testPersistence
 
-          -- it "different robots have different names" $ do
-          --   n1 <- mkRobot >>= robotName
-          --   n2 <- mkRobot >>= robotName
-          --   n1 `shouldNotBe` n2
+          it "different robots have different names" $ do
+            n1 <- mkRobot >>= robotName
+            n2 <- mkRobot >>= robotName
+            n1 `shouldNotBe` n2
 
-          -- it "new name should match expected pattern" $ do
-          --   r <- mkRobot
-          --   resetName r
-          --   robotName r >>= (`shouldSatisfy` matchesPattern)
+          it "new name should match expected pattern" $ do
+            r <- mkRobot
+            resetName r
+            robotName r >>= (`shouldSatisfy` matchesPattern)
 
-          -- it "new name is persistent" $ do
-          --   r <- mkRobot
-          --   resetName r >> testPersistence r
+          it "new name is persistent" $ do
+            r <- mkRobot
+            resetName r >> testPersistence r
 
-          -- it "new name is different from old name" $ do
-          --   r <- mkRobot
-          --   n1 <- robotName r
-          --   resetName r
-          --   n2 <- robotName r
-          --   n1 `shouldNotBe` n2
+          it "new name is different from old name" $ do
+            r <- mkRobot
+            n1 <- robotName r
+            resetName r
+            n2 <- robotName r
+            n1 `shouldNotBe` n2
 
-          -- it "resetting a robot affects only one robot" $ do
-          --   r1 <- mkRobot
-          --   r2 <- mkRobot
-          --   n1 <- robotName r1
-          --   n2 <- robotName r2
-          --   n1 `shouldNotBe` n2
-          --   resetName r1
-          --   n1' <- robotName r1
-          --   n2' <- robotName r2
-          --   n1' `shouldNotBe` n2'
-          --   n2  `shouldBe`    n2'
+          it "resetting a robot affects only one robot" $ do
+            r1 <- mkRobot
+            r2 <- mkRobot
+            n1 <- robotName r1
+            n2 <- robotName r2
+            n1 `shouldNotBe` n2
+            resetName r1
+            n1' <- robotName r1
+            n2' <- robotName r2
+            n1' `shouldNotBe` n2'
+            n2  `shouldBe`    n2'
