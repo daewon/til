@@ -106,7 +106,8 @@ loop do
   target = target.map { |title| title.css('a').text }
 
   selected = target.select do |title|
-    seen[title.downcase.hash] ? false : /해피|hhkp|포커|poker|hacker|abko/ =~ title.downcase
+    # seen[title.downcase.hash] ? false : /rk61|rk-61|해피|hhkp|포커|poker|hacker|abko|k585|k680|k580|mech/ =~ title.downcase
+    true
   end
 
   selected.each do |txt|
