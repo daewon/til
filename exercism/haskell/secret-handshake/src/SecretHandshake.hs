@@ -1,25 +1,29 @@
 module SecretHandshake (handshake) where
 
 import Data.Bits
+import Data.Maybe
+import Data.Bool
 
-handshake :: Int -> [String]
-handshake n = []
+class Bitlike a where
+  toBit :: a -> Maybe Bool
+
+instance Bitlike Char where
+  toBit '0' = Just False
+  toBit '1' = Just True
+  toBit _   = Nothing
+
+class Handshake a where
+    interpret :: a -> [Bool]
+
+instance Handshake Int where
+    interpret n = map (testBit n) [0 .. numBits]
+      where numBits = finiteBitSize n - countLeadingZeros n - 1
+
+instance Bitlike a => Handshake [a] where
+    interpret = reverse . fromMaybe [] . traverse toBit
+
+handshake :: Handshake a => a -> [String]
+handshake = foldl (flip ($)) [] . zipWith (bool id) ops . interpret
   where
-    wink = ("wink", bit 1)
-    doubleWink = ("doubleWink", bit 10)
-    closeYourEyes = ("closeYourEyes", bit 100)
-    jump = ("jump", bit 1000)
-    bit = (.&.) n
-
--- 1 = wink
--- 10 = double blink
--- 100 = close your eyes
--- 1000 = jump
-
--- 10000 = Reverse the order of the operations in the secret handshake.
--- ```
-
--- Here's a couple of examples:
-
--- Given the input 9, the function would return the array
--- ["wink", "jump"]
+    ops = map snoc ["wink", "double blink", "close your eyes", "jump"] ++ [reverse]
+    snoc s = (++ [s])
