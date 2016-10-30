@@ -13,14 +13,14 @@ instance Bitlike Char where
   toBit _   = Nothing
 
 class Handshake a where
-    interpret :: a -> [Bool]
+  interpret :: a -> [Bool]
 
 instance Handshake Int where
-    interpret n = map (testBit n) [0 .. numBits]
-      where numBits = finiteBitSize n - countLeadingZeros n - 1
+  interpret n = map (testBit n) [0 .. numBits]
+    where numBits = finiteBitSize n - countLeadingZeros n - 1
 
 instance Bitlike a => Handshake [a] where
-    interpret = reverse . fromMaybe [] . traverse toBit
+  interpret = reverse . fromMaybe [] . traverse toBit
 
 handshake :: Handshake a => a -> [String]
 handshake = foldl (flip ($)) [] . zipWith (bool id) ops . interpret
