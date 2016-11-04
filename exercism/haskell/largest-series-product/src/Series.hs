@@ -24,8 +24,8 @@ windows n xs = filter (\a -> length a == n) $ transpose $ take n $ tails xs
 largestProduct :: Int -> String -> Maybe Int
 largestProduct n str
   | n == 0 = Just 1
+  | null str = Nothing
   | n < 0 = Nothing
-  | str == [] = Nothing
   | n > length str = Nothing
   | otherwise = fmap maximum $ traverse productLs lss
   where
