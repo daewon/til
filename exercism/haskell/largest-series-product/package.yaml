@@ -1,0 +1,20 @@
+name: largest-series-product
+
+dependencies:
+  - base
+
+library:
+  exposed-modules: Series
+  source-dirs: src
+  dependencies:
+  # - foo       # List here the packages you
+  # - bar       # want to use in your solution.
+    - safe
+
+tests:
+  test:
+    main: Tests.hs
+    source-dirs: test
+    dependencies:
+      - largest-series-product
+      - hspec
