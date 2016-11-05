@@ -1,4 +1,4 @@
- module Series (largestProduct, windows, productLs) where
+module Series (largestProduct, windows, productLs) where
 
 import Data.List (transpose, tails, elem)
 
@@ -19,14 +19,17 @@ productLs :: String -> Maybe Int
 productLs = fmap product . traverse toDigit
 
 windows :: Int -> [a] -> [[a]]
-windows n xs = filter (\a -> length a == n) $ transpose $ take n $ tails xs
+windows n xs = filter pLenEq windows'
+  where
+    windows' = transpose (take n tails')
+    tails' = tails xs
+    pLenEq = (== n) . length
 
 largestProduct :: Int -> String -> Maybe Int
+largestProduct 0 _ = Just 1
 largestProduct n str
-  | n == 0 = Just 1
-  | null str = Nothing
-  | n < 0 = Nothing
-  | n > length str = Nothing
+  | null str || n < 0 || n > length str = Nothing
   | otherwise = fmap maximum $ traverse productLs lss
   where
+    lss :: [String]
     lss = windows n str
