@@ -26,7 +26,7 @@ rows :: Matrix a -> Int
 rows (Matrix _ r _) = r
 
 column :: Int -> Matrix a -> V.Vector a
-column n m = V.ifilter inColumn $ flatten m
+column n m = V.ifilter inColumn $ cells m
   where
     inColumn i _ = i `mod` c == n
     c = cols m
