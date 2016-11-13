@@ -8,8 +8,14 @@ defmodule Clock do
     if r < 0 do
       r + m
     else
-      rem(d, m)
+      r
     end
+  end
+
+  def py_div(d, m) do
+    (d / m)
+    |> Float.floor
+    |> round
   end
 
   @spec to_minute(Clock) :: integer
@@ -19,7 +25,7 @@ defmodule Clock do
 
   @spec from_minute(integer) :: Clock
   def from_minute(m) do
-    h = py_rem(div(m, 60), 24)
+    h = py_rem(py_div(m, 60), 24)
     min = py_rem(m, 60)
 
     %Clock { hour: h, minute: min }
@@ -33,7 +39,7 @@ defmodule Clock do
   """
   @spec new(integer, integer) :: Clock
   def new(hour, minute) do
-    %Clock{hour: hour, minute: minute}
+    %Clock { hour: hour, minute: minute }
     |> to_minute
     |> from_minute
   end
@@ -45,7 +51,10 @@ defmodule Clock do
   "10:03"
   """
   @spec add(Clock, integer) :: Clock
-  def add(%Clock{hour: hour, minute: minute}, add_minute) do
+  def add(%Clock{hour: hour, minute: minute}=c, add_minute) do
+    min = c |> to_minute
+    new_min = add_minute + min
+    |> from_minute
   end
 
   defimpl String.Chars, for: Clock do
