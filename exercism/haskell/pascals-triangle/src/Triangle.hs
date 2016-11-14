@@ -7,4 +7,4 @@ rows limit
   where
     triangles = iterate nextTriangle [1]
     takeN = take limit
-    nextTriangle ls = fmap (uncurry (+)) $ zip (0 : ls) (ls ++[0])
+    nextTriangle ls = zipWith (+) (0 : ls) (ls ++[0])
