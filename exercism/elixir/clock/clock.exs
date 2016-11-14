@@ -59,19 +59,10 @@ defmodule Clock do
 
   defimpl String.Chars, for: Clock do
     def to_string(%Clock{hour: h, minute: m}) do
-      if h < 10 do
-        if m < 10 do
-          "0#{h}:0#{m}"
-        else
-          "0#{h}:#{m}"
-        end
-      else
-        if m < 10 do
-          "#{h}:0#{m}"
-        else
-          "#{h}:#{m}"
-        end
-      end
+      hh = h |> Integer.to_string |> String.rjust(2, ?0)
+      mm = m |> Integer.to_string |> String.rjust(2, ?0)
+
+      "#{hh}:#{mm}"
     end
   end
 end
