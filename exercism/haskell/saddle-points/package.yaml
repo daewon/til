@@ -1,0 +1,20 @@
+name: saddle-points
+
+dependencies:
+  - array
+  - base
+
+library:
+  exposed-modules: Matrix
+  source-dirs: src
+  dependencies:
+  # - foo       # List here the packages you
+  # - bar       # want to use in your solution.
+
+tests:
+  test:
+    main: Tests.hs
+    source-dirs: test
+    dependencies:
+      - saddle-points
+      - hspec
