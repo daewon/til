@@ -1,0 +1,20 @@
+name: sieve
+
+dependencies:
+  - base
+
+library:
+  exposed-modules: Sieve
+  source-dirs: src
+  dependencies:
+    containers
+  # - foo       # List here the packages you
+  # - bar       # want to use in your solution.
+
+tests:
+  test:
+    main: Tests.hs
+    source-dirs: test
+    dependencies:
+      - sieve
+      - hspec
